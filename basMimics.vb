@@ -45,6 +45,7 @@ Imports MySql.Data.MySqlClient
 'Version 2.25   06/01/2015 Populate lstViewE for second accelerometer
 'Version 2.26   14/01/2015 Minor change to monitor parse accelerometer
 'Version 2.27   11/02/2015 Revamp of received UDP datagram handling
+'Version 2.30   17/03/2015 New GitHub account and repository
 
 'Masterbatch  Range 192.168.1.110/255.255.255.0-192.168.1.149/255.255.255.0
 'Gateway – 192.168.1.130
@@ -55,7 +56,7 @@ Imports MySql.Data.MySqlClient
 Module basMimics
 
     '***********************************************************************
-    Public strVersion As String = "Version 2.29 : 26/02/2015"
+    Public strVersion As String = "Version 2.30 : 17/03/2015"
     Public baseIP As Integer = 90
     Public blnAppMultiple As Boolean = False
     Public sql As String = Nothing
