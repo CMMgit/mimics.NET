@@ -57,6 +57,8 @@ Public Class frmControl
             blnSuspendTCP = False
             populateCombo()
 
+            
+
         Catch ex As Exception
             errorPanelsource("frmLoad")
             errorPanel(ex.Message)
@@ -674,6 +676,8 @@ Public Class frmControl
     Private Sub BTN_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles _
     BTN1.Click, BTN2.Click, BTN3.Click, BTN4.Click
 
+        Exit Sub ' Buttons are now used to drive the menu
+
         Try
             If Len(Me.cmbIP.Text) = 0 Then
                 MsgBox("There is no IP address selected.", MsgBoxStyle.Critical, "IP address required")
@@ -977,4 +981,5 @@ Public Class frmControl
         Delay(0.2)
         checkIn_TCP()
     End Sub
+
 End Class

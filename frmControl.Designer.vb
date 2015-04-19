@@ -205,7 +205,7 @@ Partial Class frmControl
         Me.BTN4.ImageList = Me.ImageList1
         Me.BTN4.Location = New System.Drawing.Point(268, 3)
         Me.BTN4.Name = "BTN4"
-        Me.BTN4.Size = New System.Drawing.Size(45, 23)
+        Me.BTN4.Size = New System.Drawing.Size(29, 23)
         Me.BTN4.TabIndex = 29
         Me.BTN4.UseVisualStyleBackColor = False
         '
@@ -215,7 +215,7 @@ Partial Class frmControl
         Me.BTN3.ImageList = Me.ImageList1
         Me.BTN3.Location = New System.Drawing.Point(183, 3)
         Me.BTN3.Name = "BTN3"
-        Me.BTN3.Size = New System.Drawing.Size(45, 23)
+        Me.BTN3.Size = New System.Drawing.Size(29, 23)
         Me.BTN3.TabIndex = 28
         Me.BTN3.UseVisualStyleBackColor = False
         '
@@ -225,7 +225,7 @@ Partial Class frmControl
         Me.BTN2.ImageList = Me.ImageList1
         Me.BTN2.Location = New System.Drawing.Point(98, 3)
         Me.BTN2.Name = "BTN2"
-        Me.BTN2.Size = New System.Drawing.Size(45, 23)
+        Me.BTN2.Size = New System.Drawing.Size(29, 23)
         Me.BTN2.TabIndex = 27
         Me.BTN2.UseVisualStyleBackColor = False
         '
@@ -235,7 +235,7 @@ Partial Class frmControl
         Me.BTN1.ImageList = Me.ImageList1
         Me.BTN1.Location = New System.Drawing.Point(13, 3)
         Me.BTN1.Name = "BTN1"
-        Me.BTN1.Size = New System.Drawing.Size(45, 23)
+        Me.BTN1.Size = New System.Drawing.Size(29, 23)
         Me.BTN1.TabIndex = 26
         Me.BTN1.UseVisualStyleBackColor = False
         '

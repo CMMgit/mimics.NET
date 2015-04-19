@@ -79,6 +79,10 @@ Public Class frmTransmit
         setupListview(Me.lstViewOutputs, "On board relay", "xRELAY:ON", "ON/OFF", "xRELAY:ON")
         setupListview(Me.lstViewOutputs, "Re-calibrate stepper motors", "xDB:FindHome_1", "1,2,3", "xDB:FindHome_x")
 
+        ' Set the Format type and the CustomFormat string.
+        DateTimePicker1.Format = DateTimePickerFormat.Custom
+        DateTimePicker1.CustomFormat = "yyyy-MM-dd HH:mm:ss"
+
     End Sub
 
     Private Sub setupListview(ByVal lstView As ListView, ByVal strDescription As String, ByVal strInstruction As String, ByVal strValues As String, ByVal strExample As String, Optional ByVal strFont As String = "NORMAL")
@@ -633,4 +637,13 @@ Public Class frmTransmit
         End If
 
     End Sub
+
+    Private Sub btnNow_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnNow.Click
+
+        Dim strDateTime As String = Me.DateTimePicker1.Value.ToString("yyyy-MM-dd HH:mm:ss")
+        Me.txtMsg.Text = "xSET:HadecoCycleStart:" & strDateTime
+        sendXmessage()
+
+    End Sub
+
 End Class

@@ -68,6 +68,9 @@ Partial Class frmTransmit
         Me.rtbMimicsINI = New System.Windows.Forms.RichTextBox
         Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
         Me.Timer2 = New System.Windows.Forms.Timer(Me.components)
+        Me.btnNow = New System.Windows.Forms.Button
+        Me.DateTimePicker1 = New System.Windows.Forms.DateTimePicker
+        Me.Label4 = New System.Windows.Forms.Label
         Me.ToolStrip1.SuspendLayout()
         Me.TabControl.SuspendLayout()
         Me.Tab1.SuspendLayout()
@@ -480,11 +483,41 @@ Partial Class frmTransmit
         'Timer2
         '
         '
+        'btnNow
+        '
+        Me.btnNow.Location = New System.Drawing.Point(587, 85)
+        Me.btnNow.Name = "btnNow"
+        Me.btnNow.Size = New System.Drawing.Size(102, 23)
+        Me.btnNow.TabIndex = 21
+        Me.btnNow.Text = "Set new date time"
+        Me.btnNow.UseVisualStyleBackColor = True
+        '
+        'DateTimePicker1
+        '
+        Me.DateTimePicker1.Format = System.Windows.Forms.DateTimePickerFormat.Custom
+        Me.DateTimePicker1.Location = New System.Drawing.Point(330, 88)
+        Me.DateTimePicker1.Name = "DateTimePicker1"
+        Me.DateTimePicker1.Size = New System.Drawing.Size(241, 20)
+        Me.DateTimePicker1.TabIndex = 22
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Font = New System.Drawing.Font("Microsoft Sans Serif", 11.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label4.Location = New System.Drawing.Point(323, 67)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(248, 18)
+        Me.Label4.TabIndex = 23
+        Me.Label4.Text = "Reset Hadeco Cycle Start Date:"
+        '
         'frmTransmit
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1037, 590)
+        Me.Controls.Add(Me.Label4)
+        Me.Controls.Add(Me.DateTimePicker1)
+        Me.Controls.Add(Me.btnNow)
         Me.Controls.Add(Me.TabControl)
         Me.Controls.Add(Me.Log)
         Me.Controls.Add(Me.btnEdit)
@@ -562,4 +595,7 @@ Partial Class frmTransmit
     Friend WithEvents Button4 As System.Windows.Forms.Button
     Friend WithEvents logCopy As System.Windows.Forms.RichTextBox
     Friend WithEvents Label3 As System.Windows.Forms.Label
+    Friend WithEvents btnNow As System.Windows.Forms.Button
+    Friend WithEvents DateTimePicker1 As System.Windows.Forms.DateTimePicker
+    Friend WithEvents Label4 As System.Windows.Forms.Label
 End Class

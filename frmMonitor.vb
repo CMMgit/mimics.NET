@@ -126,6 +126,14 @@ Public Class frmMonitor
             Me.treeView1.SelectedNode = treeView1.Nodes(0)
             'Fill_arrays_MySQL will be triggerred by selecting treeView1 here
 
+            'Dim btn As New Button
+            'btn.Size = New Size(75, 75)
+            'btn.Location = New Point(269, 51)
+            'Dim gp As New Drawing.Drawing2D.GraphicsPath
+            'gp.AddEllipse(New Rectangle(New Point(2, 2), New Size(70, 70)))
+            'btn.Region = New Region(gp)
+            'Me.Controls.Add(btn)
+
         Catch ex As Exception
             errorPanelsource("Form load")
             errorPanel(ex.Message)
@@ -346,10 +354,10 @@ Public Class frmMonitor
                             aryDigitalOut(10) = RDR.Item("D6").ToString()
                             aryDigitalOut(11) = RDR.Item("D7").ToString()
 
-                            aryDigitalInp(0) = RDR.Item("B1").ToString()
-                            aryDigitalInp(1) = RDR.Item("B2").ToString()
-                            aryDigitalInp(2) = RDR.Item("B3").ToString()
-                            aryDigitalInp(3) = RDR.Item("B4").ToString()
+                            aryDigitalInp(0) = RDR.Item("B1").ToString()     'TODO: NodeToIP longer button inputs - now a menu system
+                            aryDigitalInp(1) = RDR.Item("B2").ToString()     'TODO: NodeToIP longer button inputs - now a menu system
+                            aryDigitalInp(2) = RDR.Item("B3").ToString()     'TODO: NodeToIP longer button inputs - now a menu system
+                            aryDigitalInp(3) = RDR.Item("B4").ToString()     'TODO: NodeToIP longer button inputs - now a menu system
                             aryDigitalInp(4) = RDR.Item("D8").ToString()
                             aryDigitalInp(5) = RDR.Item("D9").ToString()
                             aryDigitalInp(6) = RDR.Item("D10").ToString()
@@ -486,8 +494,8 @@ Public Class frmMonitor
                 addItems(Me.lstViewA, aryAnalogLabels(n), aryAnalog(n), strForecolour)
             Next
 
-            Me.lstViewB.Items.Clear()
-            For n = 0 To 11
+            Me.lstViewB.Items.Clear() 'Start at 4 to leave out buttons (0 - 3) - now unused
+            For n = 4 To 11
                 If (aryActiveRedInput(n) Is Nothing) Then
                     strForecolour = "Black"
                 ElseIf (aryDigitalInp(n) = CInt(aryActiveRedInput(n))) Then
