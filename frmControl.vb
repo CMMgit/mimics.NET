@@ -57,7 +57,17 @@ Public Class frmControl
             blnSuspendTCP = False
             populateCombo()
 
-            
+            Me.btnAutoStep_1.Visible = False
+            Me.btnAutoStep_2.Visible = False
+            Me.btnAutoStep_3.Visible = False
+            Me.btnAutoFans.Visible = False
+            Me.btnAutoHeat.Visible = False
+
+            Me.lblAutoMan_1.Text = "Manual"
+            Me.lblAutoMan_2.Text = "Manual"
+            Me.lblAutoMan_3.Text = "Manual"
+            Me.lblFansAuto.Text = "Manual"
+            Me.lblHeatAuto.Text = "Manual"
 
         Catch ex As Exception
             errorPanelsource("frmLoad")
@@ -122,17 +132,17 @@ Public Class frmControl
                     'int6 = bitArray(6)
                     'int5 = bitArray(5)
 
-                    Me.btnAutoStep_1.Visible = Not (bitArray(4))
-                    Me.btnAutoStep_2.Visible = Not (bitArray(3))
-                    Me.btnAutoStep_3.Visible = Not (bitArray(2))
-                    Me.btnAutoFans.Visible = Not (bitArray(1))
-                    Me.btnAutoHeat.Visible = Not (bitArray(0))
+                    'Me.btnAutoStep_1.Visible = Not (bitArray(4))
+                    'Me.btnAutoStep_2.Visible = Not (bitArray(3))
+                    'Me.btnAutoStep_3.Visible = Not (bitArray(2))
+                    'Me.btnAutoFans.Visible = Not (bitArray(1))
+                    'Me.btnAutoHeat.Visible = Not (bitArray(0))
 
-                    If (Me.btnAutoStep_1.Visible) = True Then Me.lblAutoMan_1.Text = "Man" Else Me.lblAutoMan_1.Text = "Auto"
-                    If (Me.btnAutoStep_2.Visible) = True Then Me.lblAutoMan_2.Text = "Man" Else Me.lblAutoMan_2.Text = "Auto"
-                    If (Me.btnAutoStep_3.Visible) = True Then Me.lblAutoMan_3.Text = "Man" Else Me.lblAutoMan_3.Text = "Auto"
-                    If (Me.btnAutoFans.Visible) = True Then Me.lblFansAuto.Text = "Manual" Else Me.lblFansAuto.Text = "Auto"
-                    If (Me.btnAutoHeat.Visible) = True Then Me.lblHeatAuto.Text = "Manual" Else Me.lblHeatAuto.Text = "Auto"
+                    'If (Me.btnAutoStep_1.Visible) = True Then Me.lblAutoMan_1.Text = "Man" Else Me.lblAutoMan_1.Text = "Auto"
+                    'If (Me.btnAutoStep_2.Visible) = True Then Me.lblAutoMan_2.Text = "Man" Else Me.lblAutoMan_2.Text = "Auto"
+                    'If (Me.btnAutoStep_3.Visible) = True Then Me.lblAutoMan_3.Text = "Man" Else Me.lblAutoMan_3.Text = "Auto"
+                    'If (Me.btnAutoFans.Visible) = True Then Me.lblFansAuto.Text = "Manual" Else Me.lblFansAuto.Text = "Auto"
+                    'If (Me.btnAutoHeat.Visible) = True Then Me.lblHeatAuto.Text = "Manual" Else Me.lblHeatAuto.Text = "Auto"
 
                 ElseIf (Len(strMsg) >= 90) Then
                     'A TCP/IP message received containing all I/O's in response to a TCP/IP CheckIn request. Process the message and set I/O's accordingly.

@@ -34,8 +34,14 @@ Public Class frmMain
                 End If
             Next
 
-            
-            tmrLoad.Enabled = True
+            strCustomer = Trim(GetIni("Customer"))
+            If Len(strCustomer) = 0 Then strCustomer = "MBSA"
+
+            If (strCustomer = "MBSA") Then
+                Me.StripMain.Items(1).Visible = False
+            End If
+
+            Me.tmrLoad.Enabled = True
 
         Catch ex As Exception
             MsgBox(ex.Message)
@@ -88,8 +94,8 @@ Public Class frmMain
         Try
             Me.tmrLoad.Enabled = False
 
-            strCustomer = Trim(GetIni("Customer"))
-            If Len(strCustomer) = 0 Then strCustomer = "MBSA"
+            'strCustomer = Trim(GetIni("Customer"))
+            'If Len(strCustomer) = 0 Then strCustomer = "MBSA"
 
             'If this is Ian's  development machine then allow Customer setting
             If (File.Exists("C:\CMM Mimics\zzDevMachine.ini")) Then
@@ -173,4 +179,6 @@ Public Class frmMain
         frm.MdiParent = Me
         frm.Show()
     End Sub
+
+   
 End Class
