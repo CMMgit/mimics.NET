@@ -344,7 +344,7 @@ Public Class frmControl
         checkIn_TCP()
     End Sub
 
-   
+
     Private Sub setControls(Optional ByVal szTCP As String = Nothing)
 
         'If a TCP/IP messsage has been received then we set the control values from that string
@@ -709,7 +709,7 @@ Public Class frmControl
 
     Private Sub tmrRefresh_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tmrRefresh.Tick
         Try
-            checkIn_TCP()
+            'checkIn_TCP()   'DEBUG - To test TCP/IP from GSM module
         Catch ex As Exception
             errorPanelsource("tmrRefresh tick")
             errorPanel(ex.Message)
@@ -882,7 +882,7 @@ Public Class frmControl
         Delay(0.2)
         checkIn_TCP()
     End Sub
-    Private Sub btnAutoHeat_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAutoHeat.Click    
+    Private Sub btnAutoHeat_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAutoHeat.Click
         sendTCP(Me.cmbIP.Text, 44100, "xAutoCool", "DEBUG: Set Auto Heat ON")
         Delay(0.2)
         checkIn_TCP()
