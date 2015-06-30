@@ -811,6 +811,7 @@ Partial Class frmControl
         Me.lblHadecoCycleStart.Size = New System.Drawing.Size(74, 13)
         Me.lblHadecoCycleStart.TabIndex = 114
         Me.lblHadecoCycleStart.Text = "Hadeco Cycle"
+        Me.lblHadecoCycleStart.Visible = False
         '
         'tmrDlayTCP
         '
