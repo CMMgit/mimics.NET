@@ -73,6 +73,12 @@ Public Class frmReceive
 
             blnEnableChart = True
 
+            DateTimePicker1.Format = DateTimePickerFormat.Custom
+            DateTimePicker1.CustomFormat = "dd MMM yy"
+
+            Dim strTime = Now.ToString("HH:mm:ss")
+            Me.txtTime.Text = strTime
+
         Catch ex As Exception
             errorPanelsource("Form load")
             errorPanel(ex.Message)
@@ -176,32 +182,34 @@ Public Class frmReceive
             DG.DataSource = dbset.Tables("tblCMM")
             DG.Columns(0).Width = 50
             DG.Columns(1).Width = 70
-            DG.Columns(2).Width = 55
-            DG.Columns(3).Width = 80
+            DG.Columns(2).Width = 70
+            DG.Columns(3).Width = 55
+            DG.Columns(4).Width = 80
             DG.Columns(0).HeaderText = "ID"
-            DG.Columns(1).HeaderText = "Date"
-            DG.Columns(2).HeaderText = "Time"
-            DG.Columns(3).HeaderText = "Device IP"
+            DG.Columns(1).HeaderText = "epoch"
+            DG.Columns(2).HeaderText = "Date"
+            DG.Columns(3).HeaderText = "Time"
+            DG.Columns(4).HeaderText = "Device IP"
             If Me.chkData.Checked = True Then
                 Dim n As Integer
-                For n = 4 To 20
+                For n = 5 To 21
                     DG.Columns(n).Width = 35
                 Next
-                For n = 21 To 44
+                For n = 22 To 45
                     DG.Columns(n).Width = 26
                     DG.Columns(n).HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
                 Next
                 'Accelerometer axis
-                For n = 48 To 59
+                For n = 49 To 60
                     DG.Columns(n).Width = 49
                     DG.Columns(n).HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
                 Next
                 'Digital outputs
-                For n = 25 To 32
+                For n = 26 To 33
                     DG.Columns(n).HeaderText = "O" & CStr(n - 24)
                 Next
                 'Digital inputs
-                For n = 37 To 44
+                For n = 38 To 45
                     DG.Columns(n).HeaderText = "In" & CStr(n - 36)
                 Next
                 'Dim column As DataGridViewColumn = DataGridView.Columns(0)
@@ -411,6 +419,7 @@ Public Class frmReceive
 
         If (blnEnableChart = False) Then Exit Sub
         If (Me.cmbIP.Text = "All ip's") Then Exit Sub
+
         Try
             If (Len(Me.txtRecordCount.Text) = 0) Then Exit Sub
 
@@ -426,20 +435,53 @@ Public Class frmReceive
             'Get max ID number in order to set the start point
             If (MySqlConRx.State <> ConnectionState.Open) Then MySqlConRx.Open()
 
-            sql = "SELECT Max(ID) FROM cmm.tblmimics"
-            Dim sqlCmd As New MySqlCommand(sql, MySqlConRx)
-            Dim maxID As Integer = CInt(sqlCmd.ExecuteScalar().ToString)
-            sqlCmd = Nothing
+            If (Me.optRecords.Checked = True) Then
+                sql = "SELECT Max(lngUnix) FROM cmm.tblmimics WHERE strDevice = '" & Me.cmbIP.Text & "'"
+                Dim sqlCmd As New MySqlCommand(sql, MySqlConRx)
+                Dim maxUnix As Integer = CInt(sqlCmd.ExecuteScalar().ToString)
+                sqlCmd = Nothing
 
-            'Only by changing the record count will the Y axis change
-            If (inc = 1) Then
-                inc = -1
-            Else
-                inc = 1
+                'Only by changing the record count will the Y axis change
+                If (inc = 1) Then
+                    inc = -1
+                Else
+                    inc = 1
+                End If
+
+                Dim startUnix As Integer = (maxUnix - CInt(Me.txtRecordCount.Text) + inc) 'assume 1 record per second
+
+                'Chart will show amount of records back from greatest and keep updating thereafter
+                'Set the datetime picker values
+                sql = "SELECT datDate FROM cmm.tblmimics WHERE tblmimics.lngUnix >= " & (maxUnix - CInt(Me.txtRecordCount.Text)) & " AND strDevice = '" & Me.cmbIP.Text & "' ORDER BY ID LIMIT 5"
+                sqlCmd = New MySqlCommand(sql, MySqlConRx)
+
+                Dim strDate As String = sqlCmd.ExecuteScalar().ToString
+                Me.DateTimePicker1.Value = strDate
+                sqlCmd = Nothing
+
+                sql = "SELECT strTime FROM cmm.tblmimics WHERE tblmimics.lngUnix >= " & (maxUnix - CInt(Me.txtRecordCount.Text)) & " AND strDevice = '" & Me.cmbIP.Text & "' ORDER BY ID LIMIT 5"
+                sqlCmd = New MySqlCommand(sql, MySqlConRx)
+                Dim strDate1 = sqlCmd.ExecuteScalar().ToString
+                Me.txtTime.Text = strDate1
+                sqlCmd = Nothing
+
+                sql = "SELECT  * FROM cmm.tblmimics WHERE lngUnix > " & startUnix & " AND strDevice = '" & Me.cmbIP.Text & "' ORDER BY ID"
             End If
-            Dim startID As Integer = (maxID - CInt(Me.txtRecordCount.Text) + inc)
-            sql = "SELECT  * FROM cmm.tblmimics WHERE ID > " & startID & " AND strDevice = '" & Me.cmbIP.Text & "' ORDER BY ID"
            
+            If (Me.optDate.Checked = True) Then
+                'Chart will be static (polling stopped) and show x records from the entered start date
+                Dim datDate As Date = CDate(Me.DateTimePicker1.Value & " " & Me.txtTime.Text)
+                Dim startUnix As Long = convert_to_unix(datDate) - 7200
+                Dim stopUnix As Integer
+                Try
+                    stopUnix = (startUnix + CInt(Me.txtRecordCount.Text))
+                Catch ex As Exception
+                    Exit Sub
+                End Try
+
+                sql = "SELECT  * FROM cmm.tblmimics WHERE (lngUnix >= " & startUnix & " AND lngUnix <= " & stopUnix & ") AND strDevice = '" & Me.cmbIP.Text & "' ORDER BY ID"
+            End If
+
             Dim dbAdap As New MySqlDataAdapter(sql, MySqlConRx)
             dbAdap.SelectCommand.CommandText = sql
             Dim cmdBld As New MySqlCommandBuilder(dbAdap)
@@ -456,7 +498,6 @@ Public Class frmReceive
             Dim tsTime As TimeSpan
             Dim startTime As TimeSpan
             Dim datTime As DateTime
-            Dim strTime As String
 
             'Clear the points for the series about to be redrawn
             Dim srs As Series
@@ -482,7 +523,6 @@ Public Class frmReceive
                     If srs.Name = Me.cmbSource_2.Text Then srs.Points.AddXY(datTime, intY_2)
                 Next
 
-
                 'If (inc = 1) Then s.Points.AddXY(lngX, intY)
                 'If (inc = -1) Then s.Points.AddXY(dblTime, intY)
                 n = n + 1
@@ -500,13 +540,6 @@ Public Class frmReceive
             errorPanel(ex.Message)
         End Try
     End Sub
-    Private Sub cmbSource_2_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmbSource_1.SelectedIndexChanged
-        initChart()
-        refreshChart()
-    End Sub
-    Private Sub txtRecordCount_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtRecordCount.TextChanged
-        refreshChart()
-    End Sub
     Private Sub tmrChart_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tmrChart.Tick
         refreshChart()
     End Sub
@@ -518,7 +551,6 @@ Public Class frmReceive
         Me.txtMax.Text = "Auto"
     End Sub
     Private Sub btnGraph_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnGraph.Click
-        refreshChart()
         Me.pnlGraph.Visible = True
         Me.Width = 1382
         Me.Height = 767
@@ -528,10 +560,6 @@ Public Class frmReceive
         Me.txtRecordCount.Text = TrackBar1.Value.ToString
     End Sub
 
-    Private Sub cmbSource_2_SelectedIndexChanged_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmbSource_2.SelectedIndexChanged
-        initChart()
-        refreshChart()
-    End Sub
     Private Function dbSize()
 
         Try
@@ -577,19 +605,24 @@ Public Class frmReceive
 
     End Function
 
-    Private Sub TrackBar1_Scroll(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TrackBar1.Scroll
+    
+    Private Sub optDate_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles optDate.CheckedChanged
+        If (Me.optDate.Checked = True) Then
+            tmrPoll.Enabled = False
+            tmrLabel.Enabled = True
+            lblListening.Visible = False
+            lblListening_2.Visible = False
+            lblNotListening.Visible = True
+            lblNotListening_2.Visible = True
+        End If
 
     End Sub
 
-    Private Sub ToolStrip1_ItemClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.ToolStripItemClickedEventArgs) Handles ToolStrip1.ItemClicked
-
+    Private Sub cmbSource_1_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmbSource_1.SelectedIndexChanged
+        initChart()
     End Sub
 
-    Private Sub Chart1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Chart1.Click
-
-    End Sub
-
-    Private Sub cmbIP_2_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
-
+    Private Sub cmbSource_2_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmbSource_2.SelectedIndexChanged
+        initChart()
     End Sub
 End Class

@@ -53,6 +53,10 @@ Partial Class frmReceive
         Me.lblError = New System.Windows.Forms.Label
         Me.rtbError = New System.Windows.Forms.RichTextBox
         Me.pnlGraph = New System.Windows.Forms.Panel
+        Me.optRecords = New System.Windows.Forms.RadioButton
+        Me.optDate = New System.Windows.Forms.RadioButton
+        Me.txtTime = New System.Windows.Forms.TextBox
+        Me.DateTimePicker1 = New System.Windows.Forms.DateTimePicker
         Me.Label4 = New System.Windows.Forms.Label
         Me.Label3 = New System.Windows.Forms.Label
         Me.scale_2 = New System.Windows.Forms.TextBox
@@ -322,6 +326,10 @@ Partial Class frmReceive
         '
         Me.pnlGraph.BackColor = System.Drawing.SystemColors.GradientActiveCaption
         Me.pnlGraph.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
+        Me.pnlGraph.Controls.Add(Me.optRecords)
+        Me.pnlGraph.Controls.Add(Me.optDate)
+        Me.pnlGraph.Controls.Add(Me.txtTime)
+        Me.pnlGraph.Controls.Add(Me.DateTimePicker1)
         Me.pnlGraph.Controls.Add(Me.Label4)
         Me.pnlGraph.Controls.Add(Me.Label3)
         Me.pnlGraph.Controls.Add(Me.scale_2)
@@ -343,11 +351,46 @@ Partial Class frmReceive
         Me.pnlGraph.TabIndex = 20
         Me.pnlGraph.Visible = False
         '
+        'optRecords
+        '
+        Me.optRecords.AutoSize = True
+        Me.optRecords.Checked = True
+        Me.optRecords.Location = New System.Drawing.Point(538, 8)
+        Me.optRecords.Name = "optRecords"
+        Me.optRecords.Size = New System.Drawing.Size(14, 13)
+        Me.optRecords.TabIndex = 35
+        Me.optRecords.TabStop = True
+        Me.optRecords.UseVisualStyleBackColor = True
+        '
+        'optDate
+        '
+        Me.optDate.AutoSize = True
+        Me.optDate.Location = New System.Drawing.Point(322, 8)
+        Me.optDate.Name = "optDate"
+        Me.optDate.Size = New System.Drawing.Size(14, 13)
+        Me.optDate.TabIndex = 34
+        Me.optDate.UseVisualStyleBackColor = True
+        '
+        'txtTime
+        '
+        Me.txtTime.Location = New System.Drawing.Point(435, 5)
+        Me.txtTime.Name = "txtTime"
+        Me.txtTime.Size = New System.Drawing.Size(68, 20)
+        Me.txtTime.TabIndex = 33
+        '
+        'DateTimePicker1
+        '
+        Me.DateTimePicker1.Format = System.Windows.Forms.DateTimePickerFormat.Custom
+        Me.DateTimePicker1.Location = New System.Drawing.Point(342, 5)
+        Me.DateTimePicker1.Name = "DateTimePicker1"
+        Me.DateTimePicker1.Size = New System.Drawing.Size(87, 20)
+        Me.DateTimePicker1.TabIndex = 32
+        '
         'Label4
         '
         Me.Label4.AutoSize = True
         Me.Label4.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label4.Location = New System.Drawing.Point(433, 6)
+        Me.Label4.Location = New System.Drawing.Point(121, 6)
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(20, 17)
         Me.Label4.TabIndex = 27
@@ -357,7 +400,7 @@ Partial Class frmReceive
         '
         Me.Label3.AutoSize = True
         Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label3.Location = New System.Drawing.Point(284, 7)
+        Me.Label3.Location = New System.Drawing.Point(271, 7)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(20, 17)
         Me.Label3.TabIndex = 26
@@ -365,14 +408,14 @@ Partial Class frmReceive
         '
         'scale_2
         '
-        Me.scale_2.Location = New System.Drawing.Point(395, 3)
+        Me.scale_2.Location = New System.Drawing.Point(227, 3)
         Me.scale_2.Name = "scale_2"
         Me.scale_2.Size = New System.Drawing.Size(38, 20)
         Me.scale_2.TabIndex = 25
         '
         'scale_1
         '
-        Me.scale_1.Location = New System.Drawing.Point(245, 3)
+        Me.scale_1.Location = New System.Drawing.Point(77, 3)
         Me.scale_1.Name = "scale_1"
         Me.scale_1.Size = New System.Drawing.Size(38, 20)
         Me.scale_1.TabIndex = 24
@@ -381,7 +424,7 @@ Partial Class frmReceive
         '
         Me.cmbSource_2.FormattingEnabled = True
         Me.cmbSource_2.Items.AddRange(New Object() {"A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10"})
-        Me.cmbSource_2.Location = New System.Drawing.Point(332, 3)
+        Me.cmbSource_2.Location = New System.Drawing.Point(164, 3)
         Me.cmbSource_2.Name = "cmbSource_2"
         Me.cmbSource_2.Size = New System.Drawing.Size(57, 21)
         Me.cmbSource_2.TabIndex = 23
@@ -389,7 +432,7 @@ Partial Class frmReceive
         'Button3
         '
         Me.Button3.Font = New System.Drawing.Font("Microsoft Sans Serif", 6.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Button3.Location = New System.Drawing.Point(1057, 3)
+        Me.Button3.Location = New System.Drawing.Point(1145, 5)
         Me.Button3.Name = "Button3"
         Me.Button3.Size = New System.Drawing.Size(30, 23)
         Me.Button3.TabIndex = 22
@@ -400,7 +443,7 @@ Partial Class frmReceive
         '
         Me.Label2.AutoSize = True
         Me.Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label2.Location = New System.Drawing.Point(921, 9)
+        Me.Label2.Location = New System.Drawing.Point(1009, 11)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(74, 17)
         Me.Label2.TabIndex = 12
@@ -408,7 +451,7 @@ Partial Class frmReceive
         '
         'txtMax
         '
-        Me.txtMax.Location = New System.Drawing.Point(1001, 6)
+        Me.txtMax.Location = New System.Drawing.Point(1089, 8)
         Me.txtMax.Name = "txtMax"
         Me.txtMax.Size = New System.Drawing.Size(50, 20)
         Me.txtMax.TabIndex = 11
@@ -428,7 +471,7 @@ Partial Class frmReceive
         '
         Me.Label1.AutoSize = True
         Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label1.Location = New System.Drawing.Point(851, 9)
+        Me.Label1.Location = New System.Drawing.Point(626, 8)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(61, 17)
         Me.Label1.TabIndex = 8
@@ -436,7 +479,7 @@ Partial Class frmReceive
         '
         'txtRecordCount
         '
-        Me.txtRecordCount.Location = New System.Drawing.Point(783, 6)
+        Me.txtRecordCount.Location = New System.Drawing.Point(558, 5)
         Me.txtRecordCount.Name = "txtRecordCount"
         Me.txtRecordCount.Size = New System.Drawing.Size(62, 20)
         Me.txtRecordCount.TabIndex = 7
@@ -480,7 +523,7 @@ Partial Class frmReceive
         '
         Me.cmbSource_1.FormattingEnabled = True
         Me.cmbSource_1.Items.AddRange(New Object() {"A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10"})
-        Me.cmbSource_1.Location = New System.Drawing.Point(182, 3)
+        Me.cmbSource_1.Location = New System.Drawing.Point(14, 3)
         Me.cmbSource_1.Name = "cmbSource_1"
         Me.cmbSource_1.Size = New System.Drawing.Size(57, 21)
         Me.cmbSource_1.TabIndex = 3
@@ -498,7 +541,7 @@ Partial Class frmReceive
         'TrackBar1
         '
         Me.TrackBar1.LargeChange = 100
-        Me.TrackBar1.Location = New System.Drawing.Point(459, 3)
+        Me.TrackBar1.Location = New System.Drawing.Point(695, 7)
         Me.TrackBar1.Maximum = 10000
         Me.TrackBar1.Minimum = 10
         Me.TrackBar1.Name = "TrackBar1"
@@ -594,4 +637,8 @@ Partial Class frmReceive
     Friend WithEvents Label4 As System.Windows.Forms.Label
     Friend WithEvents Label3 As System.Windows.Forms.Label
     Friend WithEvents TrackBar1 As System.Windows.Forms.TrackBar
+    Friend WithEvents DateTimePicker1 As System.Windows.Forms.DateTimePicker
+    Friend WithEvents txtTime As System.Windows.Forms.TextBox
+    Friend WithEvents optRecords As System.Windows.Forms.RadioButton
+    Friend WithEvents optDate As System.Windows.Forms.RadioButton
 End Class
