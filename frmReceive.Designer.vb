@@ -24,9 +24,9 @@ Partial Class frmReceive
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmReceive))
-        Dim ChartArea2 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea
-        Dim Legend2 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend
-        Dim Series2 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series
+        Dim ChartArea1 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea
+        Dim Legend1 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend
+        Dim Series1 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip
         Me.btnReceive = New System.Windows.Forms.ToolStripButton
         Me.btnGraph = New System.Windows.Forms.ToolStripButton
@@ -73,6 +73,8 @@ Partial Class frmReceive
         Me.Button2 = New System.Windows.Forms.Button
         Me.TrackBar1 = New System.Windows.Forms.TrackBar
         Me.tmrChart = New System.Windows.Forms.Timer(Me.components)
+        Me.lblPollIndex = New System.Windows.Forms.Label
+        Me.lblNoIP = New System.Windows.Forms.Label
         Me.ToolStrip1.SuspendLayout()
         CType(Me.DG, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.pnlError.SuspendLayout()
@@ -326,6 +328,7 @@ Partial Class frmReceive
         '
         Me.pnlGraph.BackColor = System.Drawing.SystemColors.GradientActiveCaption
         Me.pnlGraph.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
+        Me.pnlGraph.Controls.Add(Me.lblNoIP)
         Me.pnlGraph.Controls.Add(Me.optRecords)
         Me.pnlGraph.Controls.Add(Me.optDate)
         Me.pnlGraph.Controls.Add(Me.txtTime)
@@ -490,31 +493,31 @@ Partial Class frmReceive
         Me.Chart1.BorderlineColor = System.Drawing.Color.Gray
         Me.Chart1.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid
         Me.Chart1.BorderlineWidth = 5
-        ChartArea2.AxisX.IntervalOffsetType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Number
-        ChartArea2.AxisX.IntervalType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Number
-        ChartArea2.AxisX.IsLabelAutoFit = False
-        ChartArea2.AxisX.IsMarginVisible = False
-        ChartArea2.BackColor = System.Drawing.Color.LemonChiffon
-        ChartArea2.InnerPlotPosition.Auto = False
-        ChartArea2.InnerPlotPosition.Height = 84.27526!
-        ChartArea2.InnerPlotPosition.Width = 94.59806!
-        ChartArea2.InnerPlotPosition.X = 4.79357!
-        ChartArea2.InnerPlotPosition.Y = 3.90957!
-        ChartArea2.Name = "ChartArea1"
-        Me.Chart1.ChartAreas.Add(ChartArea2)
-        Legend2.Name = "Legend1"
-        Me.Chart1.Legends.Add(Legend2)
+        ChartArea1.AxisX.IntervalOffsetType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Number
+        ChartArea1.AxisX.IntervalType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Number
+        ChartArea1.AxisX.IsLabelAutoFit = False
+        ChartArea1.AxisX.IsMarginVisible = False
+        ChartArea1.BackColor = System.Drawing.Color.LemonChiffon
+        ChartArea1.InnerPlotPosition.Auto = False
+        ChartArea1.InnerPlotPosition.Height = 84.27526!
+        ChartArea1.InnerPlotPosition.Width = 94.59806!
+        ChartArea1.InnerPlotPosition.X = 4.79357!
+        ChartArea1.InnerPlotPosition.Y = 3.90957!
+        ChartArea1.Name = "ChartArea1"
+        Me.Chart1.ChartAreas.Add(ChartArea1)
+        Legend1.Name = "Legend1"
+        Me.Chart1.Legends.Add(Legend1)
         Me.Chart1.Location = New System.Drawing.Point(3, 30)
         Me.Chart1.Name = "Chart1"
-        Series2.BackSecondaryColor = System.Drawing.Color.White
-        Series2.BorderWidth = 3
-        Series2.ChartArea = "ChartArea1"
-        Series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line
-        Series2.Color = System.Drawing.Color.Black
-        Series2.Legend = "Legend1"
-        Series2.Name = "Px"
-        Series2.YValuesPerPoint = 2
-        Me.Chart1.Series.Add(Series2)
+        Series1.BackSecondaryColor = System.Drawing.Color.White
+        Series1.BorderWidth = 3
+        Series1.ChartArea = "ChartArea1"
+        Series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line
+        Series1.Color = System.Drawing.Color.Black
+        Series1.Legend = "Legend1"
+        Series1.Name = "Px"
+        Series1.YValuesPerPoint = 2
+        Me.Chart1.Series.Add(Series1)
         Me.Chart1.Size = New System.Drawing.Size(1362, 253)
         Me.Chart1.TabIndex = 6
         Me.Chart1.Text = "Chart1"
@@ -556,11 +559,33 @@ Partial Class frmReceive
         '
         Me.tmrChart.Interval = 1500
         '
+        'lblPollIndex
+        '
+        Me.lblPollIndex.AutoSize = True
+        Me.lblPollIndex.Location = New System.Drawing.Point(807, 32)
+        Me.lblPollIndex.Name = "lblPollIndex"
+        Me.lblPollIndex.Size = New System.Drawing.Size(49, 13)
+        Me.lblPollIndex.TabIndex = 21
+        Me.lblPollIndex.Text = "pollIndex"
+        '
+        'lblNoIP
+        '
+        Me.lblNoIP.AutoSize = True
+        Me.lblNoIP.Font = New System.Drawing.Font("Tahoma", 12.0!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblNoIP.ForeColor = System.Drawing.Color.Red
+        Me.lblNoIP.Location = New System.Drawing.Point(480, 127)
+        Me.lblNoIP.Name = "lblNoIP"
+        Me.lblNoIP.Size = New System.Drawing.Size(168, 19)
+        Me.lblNoIP.TabIndex = 22
+        Me.lblNoIP.Text = "No IP adress selected!!"
+        Me.lblNoIP.Visible = False
+        '
         'frmReceive
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1372, 735)
+        Me.Controls.Add(Me.lblPollIndex)
         Me.Controls.Add(Me.pnlGraph)
         Me.Controls.Add(Me.pnlError)
         Me.Controls.Add(Me.lblListening_2)
@@ -641,4 +666,6 @@ Partial Class frmReceive
     Friend WithEvents txtTime As System.Windows.Forms.TextBox
     Friend WithEvents optRecords As System.Windows.Forms.RadioButton
     Friend WithEvents optDate As System.Windows.Forms.RadioButton
+    Friend WithEvents lblPollIndex As System.Windows.Forms.Label
+    Friend WithEvents lblNoIP As System.Windows.Forms.Label
 End Class

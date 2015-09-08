@@ -40,6 +40,12 @@ Public Class frmMonitor
             MySqlCon = New MySqlClient.MySqlConnection(MysqlConnString)
             'MySqlCon.Open()
 
+            Dim p As Integer = (MysqlConnString.IndexOf("Source=") + 8)
+            Dim q As Integer = (MysqlConnString.IndexOf(";Database") + 1)
+            strMySqlDb = Mid(MysqlConnString, p, q - p)
+
+            Me.Text = "Mimics Monitor (MySql DB: " & strMySqlDb & ")"
+
             Dim strFractions As String = GetIni("Fractions")
             If strFractions.ToUpper = "FALSE" Then blnFractions = False
             If strFractions.ToUpper = "TRUE" Then blnFractions = True
@@ -1317,5 +1323,5 @@ Err:
         End If
 
     End Sub
-    
+  
 End Class

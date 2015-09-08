@@ -16,7 +16,7 @@ Public Class frmReceive
 
     Private inc As Integer = 1
     Private intPollIndex As Integer
-
+   
     Private MySqlConRx As MySqlConnection
 
     Private dbset As New DataSet
@@ -33,6 +33,8 @@ Public Class frmReceive
         Try
             Me.Width = 1382
             Me.Height = 478
+
+            Me.lblNoIP.Visible = False
 
             btnReceive = fixButtonImage(Me.btnReceive)
             btnReset = fixButtonImage(Me.btnReset)
@@ -65,8 +67,8 @@ Public Class frmReceive
             blnEnableChart = False
 
             Me.txtRecordCount.Text = 3600
-            Me.cmbSource_1.Text = "A6"
-            Me.cmbSource_2.Text = "A8"
+            Me.cmbSource_1.Text = "A0"
+            Me.cmbSource_2.Text = "A1"
             Me.scale_1.Text = "100"
             Me.scale_2.Text = "100"
             initChart()
@@ -78,6 +80,8 @@ Public Class frmReceive
 
             Dim strTime = Now.ToString("HH:mm:ss")
             Me.txtTime.Text = strTime
+
+            Me.Text = "Mimics Receive (MySql DB: " & strMySqlDb & ")"
 
         Catch ex As Exception
             errorPanelsource("Form load")
@@ -148,8 +152,8 @@ Public Class frmReceive
 
     End Sub
     Private Sub FillDataGrid(ByVal strDate As String)
-        Try
 
+        Try
             System.Windows.Forms.Cursor.Current = Cursors.WaitCursor
             Dim strTable As String = "cmm.tblmimics_holding"
             If Me.chkData.Checked = True Then strTable = "cmm.tblmimics_holding"
@@ -164,19 +168,14 @@ Public Class frmReceive
 
             If (MySqlConRx.State <> ConnectionState.Open) Then MySqlConRx.Open()
             Dim dbAdap As New MySqlDataAdapter(sql, MySqlConRx)
-            
+
             dbAdap.SelectCommand.CommandText = sql
             Dim cmdBld As New MySqlCommandBuilder(dbAdap)
 
             dbset.Tables.Clear()
+            createTable("tblGrid")          'Will run on first form load and create dbset table for polling
             dbAdap.Fill(dbset, "tblCMM")
             dbTable = dbset.Tables("tblCMM")
-
-            'Get the highest index to start polling from
-            sql = "SELECT Max(ID) FROM " & strTable
-            Dim sqlCmd As New MySqlCommand(sql, MySqlConRx)
-            intPollIndex = CInt(sqlCmd.ExecuteScalar().ToString)
-            sqlCmd = Nothing
 
             'Bind the DataSet to the DataGrid using the DataGrid's DataSource property.
             DG.DataSource = dbset.Tables("tblCMM")
@@ -186,7 +185,7 @@ Public Class frmReceive
             DG.Columns(3).Width = 55
             DG.Columns(4).Width = 80
             DG.Columns(0).HeaderText = "ID"
-            DG.Columns(1).HeaderText = "epoch"
+            DG.Columns(1).HeaderText = "unix"
             DG.Columns(2).HeaderText = "Date"
             DG.Columns(3).HeaderText = "Time"
             DG.Columns(4).HeaderText = "Device IP"
@@ -206,11 +205,11 @@ Public Class frmReceive
                 Next
                 'Digital outputs
                 For n = 26 To 33
-                    DG.Columns(n).HeaderText = "O" & CStr(n - 24)
+                    DG.Columns(n).HeaderText = "O" & CStr(n - 25)
                 Next
                 'Digital inputs
                 For n = 38 To 45
-                    DG.Columns(n).HeaderText = "In" & CStr(n - 36)
+                    DG.Columns(n).HeaderText = "In" & CStr(n - 37)
                 Next
                 'Dim column As DataGridViewColumn = DataGridView.Columns(0)
                 'column.Width = 60
@@ -240,37 +239,113 @@ Public Class frmReceive
     Private Sub pollMySql()
 
         Try
+            'Read tblHolding either ALL or by an IP
             Dim strTable As String = "cmm.tblmimics_holding"
             If Me.chkData.Checked = True Then strTable = "cmm.tblmimics_holding"
             If Me.chkStatus.Checked = True Then strTable = "cmm.tblmimics_status"
 
-            Dim strIP As String
             If (Me.cmbIP.Text.IndexOf("All") > -1 Or Len(Me.cmbIP.Text) = 0) Then
-                sql = "SELECT * FROM " & strTable & " WHERE (ID > '" & intPollIndex & "')"
+                sql = "SELECT " & strTable & ".* FROM " & strTable
             Else
-                sql = "SELECT * FROM " & strTable & " WHERE (ID > '" & intPollIndex & "') AND strDevice = '" & Me.cmbIP.Text & "'"
+                sql = "SELECT " & strTable & ".* FROM " & strTable & " WHERE strDevice = '" & Me.cmbIP.Text & "'"
             End If
 
-            'First import all new rows to a new data table in the dataset
             If (MySqlConRx.State <> ConnectionState.Open) Then MySqlConRx.Open()
-            Dim dbAdap As New MySqlDataAdapter(sql, MySqlConRx)
 
+            'Append the lines to the datgrid dbset that are not already there by combo of IP and lngUnix
+            Dim strUnique As String
+            Dim blnFound As Boolean
+            Dim sqlReader As MySqlDataReader
+            Dim row, nrow As DataRow
+            Dim n As Integer
+            Dim sqlCmd As New MySqlCommand(sql, MySqlConRx)
+            sqlReader = sqlCmd.ExecuteReader()
+            While sqlReader.Read()
+                'Iterate through the tblHolding table
+                strUnique = sqlReader.Item("lngUnix").ToString() & sqlReader.Item("strDevice").ToString()
+
+                'Iterate through the datagrid to see if it is there 
+                For Each row In dbset.Tables("tblGrid").Rows
+                    If strUnique = row.Item("strUnique").ToString Then blnFound = True
+                Next
+
+                'Add to the datagrid if it was not there already
+                If (blnFound = False) Then
+                    nrow = dbset.Tables("tblGrid").NewRow
+                    For n = 0 To (sqlReader.FieldCount - 1)
+                        If n = 0 Then
+                            Dim strID As String = Microsoft.VisualBasic.Right(sqlReader.Item("strDevice").ToString, 3)
+                            nrow.Item(n) = Replace(strID, ".", "")
+                        ElseIf n = 2 Then
+                            nrow.Item(n) = CDate(sqlReader.Item(n).ToString).ToString("yyyy-MM-dd")
+                        Else
+                            nrow.Item(n) = sqlReader.Item(n).ToString
+                        End If
+                    Next
+                    dbset.Tables("tblGrid").Rows.Add(nrow)
+                End If
+
+            End While
+            sqlReader.Close()
+
+            'Bind the DataSet to the DataGrid using the DataGrid's DataSource property. 
+            DG.DataSource = dbset.Tables("tblGrid")
+            DG.FirstDisplayedScrollingRowIndex = DG.RowCount - 1
+
+            If (MySqlConRx.State <> ConnectionState.Closed) Then MySqlConRx.Close()
+
+            lblListening.Visible = Not lblListening.Visible
+            lblListening_2.Visible = Not lblListening_2.Visible
+
+            Me.lblDBsize.Text = "MySQL database size: " & dbSize() & " MB"
+            Me.lblRecords.Text = dbRecords(strTable)
+
+        Catch ex As Exception
+            If (MySqlConRx.State <> ConnectionState.Closed) Then MySqlConRx.Close()
+            errorPanelsource("PollMySql")
+            errorPanel(ex.Message)
+        End Try
+
+    End Sub
+    Private Sub pollMySql_ORG()
+
+        Try
+
+            'Read tblHolding either ALL or by an IP
+            'Append the lines to the datgrid that are not already there by combo of IP and lngUnix
+
+            Dim strTable As String = "cmm.tblmimics_holding"
+            If Me.chkData.Checked = True Then strTable = "cmm.tblmimics_holding"
+            If Me.chkStatus.Checked = True Then strTable = "cmm.tblmimics_status"
+
+            If (Me.cmbIP.Text.IndexOf("All") > -1 Or Len(Me.cmbIP.Text) = 0) Then
+                sql = "SELECT * FROM " & strTable & " WHERE (lngUnix > " & intPollIndex & ")"
+            Else
+                sql = "SELECT * FROM " & strTable & " WHERE (lngUnix > " & intPollIndex & ") AND strDevice = '" & Me.cmbIP.Text & "'"
+            End If
+
+            If (MySqlConRx.State <> ConnectionState.Open) Then MySqlConRx.Open()
+
+            'Import all new rows to a new data table in the dataset
+            Dim dbAdap As New MySqlDataAdapter(sql, MySqlConRx)
             dbAdap.SelectCommand.CommandText = sql
             Dim cmdBld As New MySqlCommandBuilder(dbAdap)
-
             dbAdap.Fill(dbset, "tblNew")
             dbTable = dbset.Tables("tblNew")
             dbAdap = Nothing
-            
+
+            ''Set a new poll index for the next poll
+            'sql = "SELECT Max(lngUnix) FROM " & strTable
+            'Dim sqlCmd As New MySqlCommand(sql, MySqlConRx)
+            'intPollIndex = CInt(sqlCmd.ExecuteScalar().ToString)
+            'sqlCmd = Nothing
+
+            Me.lblPollIndex.Text = CStr(intPollIndex)
+
             'Bind the DataSet to the DataGrid using the DataGrid's DataSource property. 
             DG.DataSource = dbset.Tables("tblNew")
             DG.FirstDisplayedScrollingRowIndex = DG.RowCount - 1
 
-            'Set a new poll index for the next poll
-            sql = "SELECT Max(ID) FROM " & strTable
-            Dim sqlCmd As New MySqlCommand(sql, MySqlConRx)
-            intPollIndex = CInt(sqlCmd.ExecuteScalar().ToString)
-            sqlCmd = Nothing
             If (MySqlConRx.State <> ConnectionState.Closed) Then MySqlConRx.Close()
 
             lblListening.Visible = Not lblListening.Visible
@@ -339,6 +414,7 @@ Public Class frmReceive
 
     Private Sub cmbIP_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmbIP.SelectedIndexChanged
         Dim strResult As String = CDate(DTP.Value).ToString("yyyy-MM-dd")
+        If (Me.cmbIP.Text = "All ip's") Then Me.lblNoIP.Visible = False
         FillDataGrid(strResult)
     End Sub
 
@@ -418,7 +494,12 @@ Public Class frmReceive
     Private Sub refreshChart()
 
         If (blnEnableChart = False) Then Exit Sub
-        If (Me.cmbIP.Text = "All ip's") Then Exit Sub
+        If (Me.cmbIP.Text = "All ip's") Then
+            Me.lblNoIP.Visible = True
+            Exit Sub
+        End If
+
+        Me.lblNoIP.Visible = False
 
         Try
             If (Len(Me.txtRecordCount.Text) = 0) Then Exit Sub
@@ -432,13 +513,13 @@ Public Class frmReceive
             End If
 
             '************************************************************************************
-            'Get max ID number in order to set the start point
+            'Get max lngUnix number from the holding table in order to set the starting point
             If (MySqlConRx.State <> ConnectionState.Open) Then MySqlConRx.Open()
 
             If (Me.optRecords.Checked = True) Then
-                sql = "SELECT Max(lngUnix) FROM cmm.tblmimics WHERE strDevice = '" & Me.cmbIP.Text & "'"
+                sql = "SELECT Max(lngUnix) FROM cmm.tblmimics_holding WHERE strDevice = '" & Me.cmbIP.Text & "'"
                 Dim sqlCmd As New MySqlCommand(sql, MySqlConRx)
-                Dim maxUnix As Integer = CInt(sqlCmd.ExecuteScalar().ToString)
+                Dim maxUnix As Long = CLng(sqlCmd.ExecuteScalar().ToString)
                 sqlCmd = Nothing
 
                 'Only by changing the record count will the Y axis change
@@ -448,24 +529,40 @@ Public Class frmReceive
                     inc = 1
                 End If
 
-                Dim startUnix As Integer = (maxUnix - CInt(Me.txtRecordCount.Text) + inc) 'assume 1 record per second
+                Dim startUnix As Long = (maxUnix - CLng(Me.txtRecordCount.Text) + inc) 'assume 1 record per second
 
                 'Chart will show amount of records back from greatest and keep updating thereafter
-                'Set the datetime picker values
-                sql = "SELECT datDate FROM cmm.tblmimics WHERE tblmimics.lngUnix >= " & (maxUnix - CInt(Me.txtRecordCount.Text)) & " AND strDevice = '" & Me.cmbIP.Text & "' ORDER BY ID LIMIT 5"
-                sqlCmd = New MySqlCommand(sql, MySqlConRx)
+                'Set the datetime picker values to match the startd ID - assumiming 1 record per second
+                'Temp solution here to calculate a date and time from unix rather than to look up the actual values from tblMimics
+                Dim strDate, strTime As String
 
-                Dim strDate As String = sqlCmd.ExecuteScalar().ToString
+                'sql = "SELECT datDate, strTime FROM cmm.tblmimics WHERE tblmimics.lngUnix >= " & (maxUnix - CLng(Me.txtRecordCount.Text)) & " AND strDevice = '" & Me.cmbIP.Text & "' ORDER BY ID LIMIT 1"
+                'Dim sqlReader As MySqlDataReader
+                'sqlCmd = New MySqlCommand(sql, MySqlConRx)
+
+                'sqlReader = sqlCmd.ExecuteReader()
+                'While sqlReader.Read()
+                '    strDate = sqlReader.Item("datDate").ToString()
+                '    strTime = sqlReader.Item("strTime").ToString() 'This returns a looked up value
+                'End While
+                'sqlReader.Close()
+
+                strDate = CDate(mimicDate(maxUnix - CLng(Me.txtRecordCount.Text))).ToString("yyyy-MM-dd")
+                strTime = mimicTime(maxUnix - CLng(Me.txtRecordCount.Text))  'This returns a calculated value
+
                 Me.DateTimePicker1.Value = strDate
-                sqlCmd = Nothing
-
-                sql = "SELECT strTime FROM cmm.tblmimics WHERE tblmimics.lngUnix >= " & (maxUnix - CInt(Me.txtRecordCount.Text)) & " AND strDevice = '" & Me.cmbIP.Text & "' ORDER BY ID LIMIT 5"
-                sqlCmd = New MySqlCommand(sql, MySqlConRx)
-                Dim strDate1 = sqlCmd.ExecuteScalar().ToString
-                Me.txtTime.Text = strDate1
-                sqlCmd = Nothing
+                Me.txtTime.Text = strTime
 
                 sql = "SELECT  * FROM cmm.tblmimics WHERE lngUnix > " & startUnix & " AND strDevice = '" & Me.cmbIP.Text & "' ORDER BY ID"
+
+                sql = "SELECT ID, lngUnix, datDate, strTime, strDevice," _
+                    & " A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, Ext," _
+                    & " L1, L2, L3, L4, D0, D1, D2, D3, D4, D5, D6, D7, B1, B2, B3, B4, D8, D9, D10, D11, D12, D13, D14, D15," _
+                    & " Peripheral_1, Peripheral_2, Peripheral_3, x_max, x_min, y_max, y_min, z_max, z_min, x_max_2, x_min_2, y_max_2, y_min_2, z_max_2, z_min_2" _
+                    & " FROM cmm.tblmimics WHERE lngUnix > " & startUnix & " AND strDevice = '" & Me.cmbIP.Text & "' ORDER BY ID"
+
+                sql = "SELECT ID, strTime, " & Me.cmbSource_1.Text & ", " & Me.cmbSource_2.Text & _
+                      " FROM cmm.tblmimics WHERE lngUnix > " & startUnix & " AND strDevice = '" & Me.cmbIP.Text & "' ORDER BY ID"
             End If
            
             If (Me.optDate.Checked = True) Then
@@ -473,6 +570,7 @@ Public Class frmReceive
                 Dim datDate As Date = CDate(Me.DateTimePicker1.Value & " " & Me.txtTime.Text)
                 Dim startUnix As Long = convert_to_unix(datDate) - 7200
                 Dim stopUnix As Integer
+
                 Try
                     stopUnix = (startUnix + CInt(Me.txtRecordCount.Text))
                 Catch ex As Exception
@@ -480,15 +578,25 @@ Public Class frmReceive
                 End Try
 
                 sql = "SELECT  * FROM cmm.tblmimics WHERE (lngUnix >= " & startUnix & " AND lngUnix <= " & stopUnix & ") AND strDevice = '" & Me.cmbIP.Text & "' ORDER BY ID"
+
+                sql = "SELECT ID, lngUnix, datDate, strTime, strDevice," _
+                    & " A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, Ext," _
+                    & " L1, L2, L3, L4, D0, D1, D2, D3, D4, D5, D6, D7, B1, B2, B3, B4, D8, D9, D10, D11, D12, D13, D14, D15," _
+                    & " Peripheral_1, Peripheral_2, Peripheral_3, x_max, x_min, y_max, y_min, z_max, z_min, x_max_2, x_min_2, y_max_2, y_min_2, z_max_2, z_min_2" _
+                    & " FROM cmm.tblmimics WHERE (lngUnix >= " & startUnix & " AND lngUnix <= " & stopUnix & ") AND strDevice = '" & Me.cmbIP.Text & "' ORDER BY ID"
+
+                sql = "SELECT ID, strTime, " & Me.cmbSource_1.Text & ", " & Me.cmbSource_2.Text & _
+                      " FROM cmm.tblmimics WHERE (lngUnix >= " & startUnix & " AND lngUnix <= " & stopUnix & ") AND strDevice = '" & Me.cmbIP.Text & "' ORDER BY ID"
+
             End If
 
             Dim dbAdap As New MySqlDataAdapter(sql, MySqlConRx)
             dbAdap.SelectCommand.CommandText = sql
-            Dim cmdBld As New MySqlCommandBuilder(dbAdap)
+
+            Dim cmdBld As New MySqlCommandBuilder(dbAdap)        'This is the time consuming line with a large MySql
+
             Dim dataSet As New DataSet
             dbAdap.Fill(dataSet, "tblChart")
-            Dim tbl As New DataTable
-            tbl = dataSet.Tables("tblChart")
             dbAdap = Nothing
             If (MySqlConRx.State <> ConnectionState.Closed) Then MySqlConRx.Close()
 
@@ -507,7 +615,7 @@ Public Class frmReceive
             Next
 
             Dim row As DataRow
-            For Each row In tbl.Rows
+            For Each row In dataSet.Tables("tblChart").Rows
                 tsTime = row.Item("strTime")
                 If (n = 0) Then startTime = tsTime
                 dblTime = Math.Round((tsTime.Hours) + (tsTime.Minutes / 60) + (tsTime.Seconds / 3600), 1)
@@ -604,8 +712,6 @@ Public Class frmReceive
         End Try
 
     End Function
-
-    
     Private Sub optDate_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles optDate.CheckedChanged
         If (Me.optDate.Checked = True) Then
             tmrPoll.Enabled = False
@@ -624,5 +730,34 @@ Public Class frmReceive
 
     Private Sub cmbSource_2_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmbSource_2.SelectedIndexChanged
         initChart()
+    End Sub
+    Private Sub createTable(ByVal strTablename As String)
+        Try
+
+            Dim n As Integer
+            For n = 0 To dbset.Tables.Count - 1
+                If dbset.Tables(n).TableName = strTablename Then Exit Sub
+            Next
+
+            'Set up a table in dbset that will later be attached to the datagrid for when polling starts
+            'Create a structure to match the MySql table but leave it empty
+            If (MySqlConRx.State <> ConnectionState.Open) Then MySqlConRx.Open()
+            sql = "SELECT cmm.tblmimics_holding.* FROM cmm.tblmimics_holding"
+            Dim sqlReader As MySqlDataReader
+            Dim sqlCmd As New MySqlCommand(sql, MySqlConRx)
+            sqlReader = sqlCmd.ExecuteReader()
+
+            dbset.Tables.Add(strTablename)
+            For n = 0 To (sqlReader.FieldCount - 1)
+                dbset.Tables(strTablename).Columns.Add(sqlReader.GetName(n).ToString)
+            Next
+            sqlReader.Close()
+            If (MySqlConRx.State <> ConnectionState.Closed) Then MySqlConRx.Close()
+
+        Catch ex As Exception
+            If (MySqlConRx.State <> ConnectionState.Closed) Then MySqlConRx.Close()
+            errorPanelsource("createTable()")
+            errorPanel(ex.Message)
+        End Try
     End Sub
 End Class
