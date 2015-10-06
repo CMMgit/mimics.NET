@@ -432,7 +432,8 @@ Public Class frmMonitor
                 Me.lstViewB.Visible = False
                 Me.lstViewC.Visible = False
                 Me.lstViewD.Visible = False
-                  Me.lblDateTimeStamp.Visible = False
+                Me.lstViewF.Visible = False
+                Me.lblDateTimeStamp.Visible = False
                 Me.lblDisconnect.Visible = False
                 Exit Sub
             Else
@@ -440,6 +441,7 @@ Public Class frmMonitor
                 Me.lstViewB.Visible = True
                 Me.lstViewC.Visible = True
                 Me.lstViewD.Visible = True
+                Me.lstViewF.Visible = True
                 Me.lblDateTimeStamp.Visible = True
                 Me.lblDisconnect.Visible = True
             End If
@@ -459,7 +461,11 @@ Public Class frmMonitor
                     If strCustomer = "Hadeco" Then aryAnalogLabels = aryAnalogLabels_5
                 Case 25 To 39
                     aryAnalogLabels = aryAnalogLabels_2
-                Case 40 To 48
+                Case 40
+                    aryAnalogLabels = aryAnalogLabels_4
+                Case 41
+                    aryAnalogLabels = aryAnalogLabels_5 'MBSA Server Roon
+                Case 42 To 48
                     aryAnalogLabels = aryAnalogLabels_4
                 Case 49
                     aryAnalogLabels = aryAnalogLabels_3
@@ -482,7 +488,17 @@ Public Class frmMonitor
                     aryActiveRedInput = aryActiveRedInput_2
                     aryDigitalOutLabels = aryDigitalOutLabels_2
                     aryActiveRedOutput = aryActiveRedOutput_2
-                Case 40 To 48
+                Case 40
+                    aryDigitalLabels = aryDigitalLabels_4
+                    aryActiveRedInput = aryActiveRedInput_4
+                    aryDigitalOutLabels = aryDigitalOutLabels_4
+                    aryActiveRedOutput = aryActiveRedOutput_4
+                Case 41
+                    aryDigitalLabels = aryDigitalLabels_5           'MBSA Server room
+                    aryActiveRedInput = aryActiveRedInput_5
+                    aryDigitalOutLabels = aryDigitalOutLabels_3
+                    aryActiveRedOutput = aryActiveRedOutput_3
+                Case 42 To 48
                     aryDigitalLabels = aryDigitalLabels_4
                     aryActiveRedInput = aryActiveRedInput_4
                     aryDigitalOutLabels = aryDigitalOutLabels_4

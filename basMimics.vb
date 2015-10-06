@@ -57,7 +57,7 @@ Imports MySql.Data.MySqlClient
 Module basMimics
 
     '***********************************************************************
-    Public strVersion As String = "Version 2.40 : 27/08/2015"
+    Public strVersion As String = "Version 2.43 : 04/10/2015"
     Public strMySqlDb As String
     Public baseIP As Integer = 90
     Public blnAppMultiple As Boolean = False
@@ -303,7 +303,7 @@ Module basMimics
         aryDigitalLabels_2(5, 2) = "Lid(1)"         'D9 Label
         aryDigitalLabels_2(5, 1) = "OPEN"           'D9 HIGH
         aryDigitalLabels_2(5, 0) = "CLOSED"         'D9 LOW
-        aryDigitalLabels_2(6, 2) = "Dump Shoot(1)"  'D10 Label
+        aryDigitalLabels_2(6, 2) = "Dump Chute(1)"  'D10 Label
         aryDigitalLabels_2(6, 1) = "OPEN"           'D10 HIGH
         aryDigitalLabels_2(6, 0) = "SHUT"           'D10 LOW
         aryDigitalLabels_2(7, 2) = "Mixer Speed(1)" 'D11 Label
@@ -315,7 +315,7 @@ Module basMimics
         aryDigitalLabels_2(9, 2) = "Lid(2)"         'D13 Label
         aryDigitalLabels_2(9, 1) = "OPEN"           'D13 HIGH
         aryDigitalLabels_2(9, 0) = "CLOSE"          'D13 LOW
-        aryDigitalLabels_2(10, 2) = "Dump Shoot(2)" 'D14 Label
+        aryDigitalLabels_2(10, 2) = "Dump Chute(2)" 'D14 Label
         aryDigitalLabels_2(10, 1) = "OPEN"          'D14 HIGH
         aryDigitalLabels_2(10, 0) = "SHUT"          'D14 LOW
         aryDigitalLabels_2(11, 2) = "Mixer Speed(2)" 'D15 Label
@@ -642,18 +642,18 @@ Module basMimics
         aryAnalogLabels_5(1) = "Relative Humidity 2"
         aryAnalogLabels_5(2) = "Relative Humidity 3"
         aryAnalogLabels_5(3) = "Relative Humidity 4"
-        aryAnalogLabels_5(4) = "Relative Humidity 5"
-        aryAnalogLabels_5(5) = "Relative Humidity 6"
+        aryAnalogLabels_5(4) = "TBA"
+        aryAnalogLabels_5(5) = "TBA"
         aryAnalogLabels_5(6) = "Temperature 1"
         aryAnalogLabels_5(7) = "Temperature 2"
         aryAnalogLabels_5(8) = "Temperature 3"
         aryAnalogLabels_5(9) = "Temperature 4"
-        aryAnalogLabels_5(10) = "Temperature 5"
-        aryAnalogLabels_5(11) = "Temperature 6"
-        aryAnalogLabels_5(12) = "Temperature 7"
-        aryAnalogLabels_5(13) = "Binne Louvre"
-        aryAnalogLabels_5(14) = "Buiten Louvre"
-        aryAnalogLabels_5(15) = "Solar Louvre"
+        aryAnalogLabels_5(10) = "TBA"
+        aryAnalogLabels_5(11) = "TBA"
+        aryAnalogLabels_5(12) = "TBA"
+        aryAnalogLabels_5(13) = "TBA"
+        aryAnalogLabels_5(14) = "TBA"
+        aryAnalogLabels_5(15) = "TBA"
 
         '2 = Title label, 1 = HIGH label, 0 = LOW value
         aryDigitalLabels_5(0, 2) = "BTN1"           'BTN1 Label
@@ -675,12 +675,12 @@ Module basMimics
         aryDigitalLabels_5(5, 2) = "Available"      'D9 Label
         aryDigitalLabels_5(5, 1) = "AVLB"           'D9 HIGH
         aryDigitalLabels_5(5, 0) = "AVLB"           'D9 LOW
-        aryDigitalLabels_5(6, 2) = "Movement"       'D10 Label
+        aryDigitalLabels_5(6, 2) = "Motion sense"   'D10 Label
         aryDigitalLabels_5(6, 1) = "MOTION"         'D10 HIGH
         aryDigitalLabels_5(6, 0) = "STILL"          'D10 LOW
-        aryDigitalLabels_5(7, 2) = "FANS"           'D11 Label
-        aryDigitalLabels_5(7, 1) = "OFF"            'D11 HIGH
-        aryDigitalLabels_5(7, 0) = "ON"             'D11 LOW
+        aryDigitalLabels_5(7, 2) = "Input 4 (D11)"  'D11 Label
+        aryDigitalLabels_5(7, 1) = "HIGH"            'D11 HIGH
+        aryDigitalLabels_5(7, 0) = "LOW"             'D11 LOW
         aryDigitalLabels_5(8, 2) = "Input 5 (D12)"  'D12 Label
         aryDigitalLabels_5(8, 1) = "HIGH"           'D12 HIGH
         aryDigitalLabels_5(8, 0) = "LOW"            'D12 LOW
