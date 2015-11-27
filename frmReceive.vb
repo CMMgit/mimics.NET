@@ -29,12 +29,20 @@ Public Class frmReceive
     Private blnEnableChart = False
     Private inRecurs As Boolean = False
 
+    Private blnByRecords As Boolean = True
+    Private blnByDate As Boolean = False
+    Private blnDONOTUPDATE As Boolean = False
+
+
     Private Sub frmReceive_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
             Me.Width = 1382
             Me.Height = 478
 
             Me.lblNoIP.Visible = False
+
+            Dim CLR As Color = Me.btnSubmit.BackColor
+            Dim strclr As String = CLR.ToString
 
             btnReceive = fixButtonImage(Me.btnReceive)
             btnReset = fixButtonImage(Me.btnReset)
@@ -65,6 +73,7 @@ Public Class frmReceive
             Me.cmbIP.Text = "All ip's"
 
             blnEnableChart = False
+            blnDONOTUPDATE = True
 
             Me.txtRecordCount.Text = 3600
             Me.cmbSource_1.Text = "A0"
@@ -82,6 +91,13 @@ Public Class frmReceive
             Me.txtTime.Text = strTime
 
             Me.Text = "Mimics Receive (MySql DB: " & strMySqlDb & ")"
+
+            Me.txtDateOrRecords.Text = "Records"
+            writerChartVariables()
+            blnDONOTUPDATE = False
+
+            Me.tmrSubmit.Enabled = False
+            Me.btnSubmit.BackColor = SystemColors.Control
 
         Catch ex As Exception
             errorPanelsource("Form load")
@@ -151,6 +167,7 @@ Public Class frmReceive
         End Try
 
     End Sub
+    
     Private Sub FillDataGrid(ByVal strDate As String)
 
         Try
@@ -203,6 +220,8 @@ Public Class frmReceive
                     DG.Columns(n).Width = 49
                     DG.Columns(n).HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
                 Next
+                'strUnique
+                DG.Columns(61).Width = 200
                 'Digital outputs
                 For n = 26 To 33
                     DG.Columns(n).HeaderText = "O" & CStr(n - 25)
@@ -221,8 +240,8 @@ Public Class frmReceive
             'Scroll to the last row of the DG
             'If on form load it will not work - the Timer3 will do it 500mS later
             intDGscrollIndex = DG.RowCount - 1
-            DG.FirstDisplayedScrollingRowIndex = intDGscrollIndex
-
+            'DG.FirstDisplayedScrollingRowIndex = intDGscrollIndex
+            DG.Sort(DG.Columns(1), ComponentModel.ListSortDirection.Ascending)
             Me.lblRecords.Text = dbRecords(strTable)
 
             System.Windows.Forms.Cursor.Current = Cursors.Default
@@ -262,11 +281,18 @@ Public Class frmReceive
             sqlReader = sqlCmd.ExecuteReader()
             While sqlReader.Read()
                 'Iterate through the tblHolding table
+                Dim strIP As String = sqlReader.Item("strDevice").ToString()
+                If (Microsoft.VisualBasic.Right(strIP, 3) = "131") Then strIP = strIP
                 strUnique = sqlReader.Item("lngUnix").ToString() & sqlReader.Item("strDevice").ToString()
+                strUnique = sqlReader.Item("strUnique").ToString()
 
                 'Iterate through the datagrid to see if it is there 
+                blnFound = False
                 For Each row In dbset.Tables("tblGrid").Rows
-                    If strUnique = row.Item("strUnique").ToString Then blnFound = True
+                    If strUnique = row.Item("strUnique").ToString Then
+                        blnFound = True
+                        Exit For
+                    End If
                 Next
 
                 'Add to the datagrid if it was not there already
@@ -290,6 +316,7 @@ Public Class frmReceive
 
             'Bind the DataSet to the DataGrid using the DataGrid's DataSource property. 
             DG.DataSource = dbset.Tables("tblGrid")
+            DG.Sort(DG.Columns(1), ComponentModel.ListSortDirection.Ascending)
             DG.FirstDisplayedScrollingRowIndex = DG.RowCount - 1
 
             If (MySqlConRx.State <> ConnectionState.Closed) Then MySqlConRx.Close()
@@ -307,61 +334,7 @@ Public Class frmReceive
         End Try
 
     End Sub
-    Private Sub pollMySql_ORG()
-
-        Try
-
-            'Read tblHolding either ALL or by an IP
-            'Append the lines to the datgrid that are not already there by combo of IP and lngUnix
-
-            Dim strTable As String = "cmm.tblmimics_holding"
-            If Me.chkData.Checked = True Then strTable = "cmm.tblmimics_holding"
-            If Me.chkStatus.Checked = True Then strTable = "cmm.tblmimics_status"
-
-            If (Me.cmbIP.Text.IndexOf("All") > -1 Or Len(Me.cmbIP.Text) = 0) Then
-                sql = "SELECT * FROM " & strTable & " WHERE (lngUnix > " & intPollIndex & ")"
-            Else
-                sql = "SELECT * FROM " & strTable & " WHERE (lngUnix > " & intPollIndex & ") AND strDevice = '" & Me.cmbIP.Text & "'"
-            End If
-
-            If (MySqlConRx.State <> ConnectionState.Open) Then MySqlConRx.Open()
-
-            'Import all new rows to a new data table in the dataset
-            Dim dbAdap As New MySqlDataAdapter(sql, MySqlConRx)
-            dbAdap.SelectCommand.CommandText = sql
-            Dim cmdBld As New MySqlCommandBuilder(dbAdap)
-            dbAdap.Fill(dbset, "tblNew")
-            dbTable = dbset.Tables("tblNew")
-            dbAdap = Nothing
-
-            ''Set a new poll index for the next poll
-            'sql = "SELECT Max(lngUnix) FROM " & strTable
-            'Dim sqlCmd As New MySqlCommand(sql, MySqlConRx)
-            'intPollIndex = CInt(sqlCmd.ExecuteScalar().ToString)
-            'sqlCmd = Nothing
-
-            Me.lblPollIndex.Text = CStr(intPollIndex)
-
-            'Bind the DataSet to the DataGrid using the DataGrid's DataSource property. 
-            DG.DataSource = dbset.Tables("tblNew")
-            DG.FirstDisplayedScrollingRowIndex = DG.RowCount - 1
-
-            If (MySqlConRx.State <> ConnectionState.Closed) Then MySqlConRx.Close()
-
-            lblListening.Visible = Not lblListening.Visible
-            lblListening_2.Visible = Not lblListening_2.Visible
-
-            Me.lblDBsize.Text = "MySQL database size: " & dbSize() & " MB"
-            Me.lblRecords.Text = dbRecords(strTable)
-
-        Catch ex As Exception
-            If (MySqlConRx.State <> ConnectionState.Closed) Then MySqlConRx.Close()
-            errorPanelsource("PollMySql")
-            errorPanel(ex.Message)
-        End Try
-
-    End Sub
-
+    
     Private Sub tmrPoll_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tmrPoll.Tick
         Try
             pollMySql()
@@ -491,6 +464,22 @@ Public Class frmReceive
             MsgBox(ex.Message)
         End Try
     End Sub
+    Private Sub writerChartVariables()
+        Try
+            
+            Dim datDate As Date = CDate(Me.DateTimePicker1.Value)
+            Dim strDate = datDate.ToString("dd MMM yyyy")
+            Dim strTime = Me.txtTime.Text
+            datDate = CDate(strDate & " " & strTime)
+            Me.txtDateSel.Text = CStr(convert_to_unix(datDate) - 7200)
+            Me.txtRecordSel.Text = Me.txtRecordCount.Text
+            Me.txtDateTime.Text = strDate & " " & strTime
+
+        Catch ex As Exception
+            errorPanelsource("writerChartVariables")
+            errorPanel(ex.Message)
+        End Try
+    End Sub
     Private Sub refreshChart()
 
         If (blnEnableChart = False) Then Exit Sub
@@ -502,7 +491,7 @@ Public Class frmReceive
         Me.lblNoIP.Visible = False
 
         Try
-            If (Len(Me.txtRecordCount.Text) = 0) Then Exit Sub
+            If (Len(Me.txtRecordSel.Text) = 0) Then Exit Sub
 
             If (Me.txtMax.Text <> "Auto" And Len(Me.txtMax.Text) > 0) Then
                 Chart1.ChartAreas(0).AxisY.Maximum = CInt(Me.txtMax.Text)
@@ -516,8 +505,9 @@ Public Class frmReceive
             'Get max lngUnix number from the holding table in order to set the starting point
             If (MySqlConRx.State <> ConnectionState.Open) Then MySqlConRx.Open()
 
-            If (Me.optRecords.Checked = True) Then
+            If (Me.txtDateOrRecords.Text = "Records") Then
                 sql = "SELECT Max(lngUnix) FROM cmm.tblmimics_holding WHERE strDevice = '" & Me.cmbIP.Text & "'"
+
                 Dim sqlCmd As New MySqlCommand(sql, MySqlConRx)
                 Dim maxUnix As Long = CLng(sqlCmd.ExecuteScalar().ToString)
                 sqlCmd = Nothing
@@ -529,64 +519,41 @@ Public Class frmReceive
                     inc = 1
                 End If
 
-                Dim startUnix As Long = (maxUnix - CLng(Me.txtRecordCount.Text) + inc) 'assume 1 record per second
+                Dim startUnix As Long = (maxUnix - CLng(Me.txtRecordSel.Text) + inc) 'assume 1 record per second
 
                 'Chart will show amount of records back from greatest and keep updating thereafter
                 'Set the datetime picker values to match the startd ID - assumiming 1 record per second
                 'Temp solution here to calculate a date and time from unix rather than to look up the actual values from tblMimics
                 Dim strDate, strTime As String
 
-                'sql = "SELECT datDate, strTime FROM cmm.tblmimics WHERE tblmimics.lngUnix >= " & (maxUnix - CLng(Me.txtRecordCount.Text)) & " AND strDevice = '" & Me.cmbIP.Text & "' ORDER BY ID LIMIT 1"
-                'Dim sqlReader As MySqlDataReader
-                'sqlCmd = New MySqlCommand(sql, MySqlConRx)
+                strDate = CDate(mimicDate(maxUnix - CLng(Me.txtRecordSel.Text))).ToString("yyyy-MM-dd")
+                strTime = mimicTime(maxUnix - CLng(Me.txtRecordSel.Text))  'This returns the calculated value
 
-                'sqlReader = sqlCmd.ExecuteReader()
-                'While sqlReader.Read()
-                '    strDate = sqlReader.Item("datDate").ToString()
-                '    strTime = sqlReader.Item("strTime").ToString() 'This returns a looked up value
-                'End While
-                'sqlReader.Close()
+                'blnDONOTUPDATE = True
+                'Me.DateTimePicker1.Value = strDate
+                'Me.txtTime.Text = strTime
+                'blnDONOTUPDATE = False
 
-                strDate = CDate(mimicDate(maxUnix - CLng(Me.txtRecordCount.Text))).ToString("yyyy-MM-dd")
-                strTime = mimicTime(maxUnix - CLng(Me.txtRecordCount.Text))  'This returns a calculated value
+                ''TODO:
+                'Stored procedure here to append records greater than startUnix into a working table
 
-                Me.DateTimePicker1.Value = strDate
-                Me.txtTime.Text = strTime
-
-                sql = "SELECT  * FROM cmm.tblmimics WHERE lngUnix > " & startUnix & " AND strDevice = '" & Me.cmbIP.Text & "' ORDER BY ID"
-
-                sql = "SELECT ID, lngUnix, datDate, strTime, strDevice," _
-                    & " A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, Ext," _
-                    & " L1, L2, L3, L4, D0, D1, D2, D3, D4, D5, D6, D7, B1, B2, B3, B4, D8, D9, D10, D11, D12, D13, D14, D15," _
-                    & " Peripheral_1, Peripheral_2, Peripheral_3, x_max, x_min, y_max, y_min, z_max, z_min, x_max_2, x_min_2, y_max_2, y_min_2, z_max_2, z_min_2" _
-                    & " FROM cmm.tblmimics WHERE lngUnix > " & startUnix & " AND strDevice = '" & Me.cmbIP.Text & "' ORDER BY ID"
-
-                sql = "SELECT ID, strTime, " & Me.cmbSource_1.Text & ", " & Me.cmbSource_2.Text & _
-                      " FROM cmm.tblmimics WHERE lngUnix > " & startUnix & " AND strDevice = '" & Me.cmbIP.Text & "' ORDER BY ID"
+                sql = "SELECT ID, lngUnix, strTime, " & Me.cmbSource_1.Text & ", " & Me.cmbSource_2.Text & _
+                      " FROM cmm.tblmimics WHERE lngUnix > " & startUnix & " AND strDevice = '" & Me.cmbIP.Text & "' ORDER BY lngUnix"
             End If
            
-            If (Me.optDate.Checked = True) Then
-                'Chart will be static (polling stopped) and show x records from the entered start date
-                Dim datDate As Date = CDate(Me.DateTimePicker1.Value & " " & Me.txtTime.Text)
-                Dim startUnix As Long = convert_to_unix(datDate) - 7200
+            If (Me.txtDateOrRecords.Text = "DateTime") Then
+                'Chart will be static (scrolling stopped) and show x records from the entered start date
+                Dim startUnix As Long = Me.txtDateSel.Text
                 Dim stopUnix As Integer
 
                 Try
-                    stopUnix = (startUnix + CInt(Me.txtRecordCount.Text))
+                    stopUnix = (startUnix + CInt(Me.txtRecordSel.Text))
                 Catch ex As Exception
                     Exit Sub
                 End Try
 
-                sql = "SELECT  * FROM cmm.tblmimics WHERE (lngUnix >= " & startUnix & " AND lngUnix <= " & stopUnix & ") AND strDevice = '" & Me.cmbIP.Text & "' ORDER BY ID"
-
-                sql = "SELECT ID, lngUnix, datDate, strTime, strDevice," _
-                    & " A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, Ext," _
-                    & " L1, L2, L3, L4, D0, D1, D2, D3, D4, D5, D6, D7, B1, B2, B3, B4, D8, D9, D10, D11, D12, D13, D14, D15," _
-                    & " Peripheral_1, Peripheral_2, Peripheral_3, x_max, x_min, y_max, y_min, z_max, z_min, x_max_2, x_min_2, y_max_2, y_min_2, z_max_2, z_min_2" _
-                    & " FROM cmm.tblmimics WHERE (lngUnix >= " & startUnix & " AND lngUnix <= " & stopUnix & ") AND strDevice = '" & Me.cmbIP.Text & "' ORDER BY ID"
-
-                sql = "SELECT ID, strTime, " & Me.cmbSource_1.Text & ", " & Me.cmbSource_2.Text & _
-                      " FROM cmm.tblmimics WHERE (lngUnix >= " & startUnix & " AND lngUnix <= " & stopUnix & ") AND strDevice = '" & Me.cmbIP.Text & "' ORDER BY ID"
+                sql = "SELECT ID, lngUnix, strTime, " & Me.cmbSource_1.Text & ", " & Me.cmbSource_2.Text & _
+                      " FROM cmm.tblmimics WHERE (lngUnix >= " & startUnix & " AND lngUnix <= " & stopUnix & ") AND strDevice = '" & Me.cmbIP.Text & "' ORDER BY lngUnix"
 
             End If
 
@@ -668,7 +635,7 @@ Public Class frmReceive
         Me.txtRecordCount.Text = TrackBar1.Value.ToString
     End Sub
 
-    Private Function dbSize()
+    Private Function dbSize() As String
 
         Try
             sql = "SELECT sum(data_length + index_length) / 1024 / 1024 'dbSize'" _
@@ -681,6 +648,10 @@ Public Class frmReceive
             sqlCmd = Nothing
             If (MySqlConRx.State <> ConnectionState.Closed) Then MySqlConRx.Close()
 
+            Dim dblResult As Double = CDbl(strResult)
+            dblResult = Math.Round(dblResult, 1)
+
+            strResult = CStr(dblResult)
 
             Return strResult
 
@@ -712,15 +683,16 @@ Public Class frmReceive
         End Try
 
     End Function
-    Private Sub optDate_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles optDate.CheckedChanged
-        If (Me.optDate.Checked = True) Then
+    Private Sub optDate_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
+
+        'If (Me.optDate.Checked = True) Then
             tmrPoll.Enabled = False
             tmrLabel.Enabled = True
             lblListening.Visible = False
             lblListening_2.Visible = False
             lblNotListening.Visible = True
             lblNotListening_2.Visible = True
-        End If
+        'End If
 
     End Sub
 
@@ -759,5 +731,52 @@ Public Class frmReceive
             errorPanelsource("createTable()")
             errorPanel(ex.Message)
         End Try
+    End Sub
+
+    Private Sub btnSubmit_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSubmit.Click
+        writerChartVariables()
+        Me.tmrSubmit.Enabled = False
+        Me.btnSubmit.BackColor = SystemColors.Control
+    End Sub
+
+    Private Sub txtRecordCount_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtRecordCount.TextChanged
+        blnByRecords = True
+        blnByDate = False
+
+        Me.tmrSubmit.Enabled = True
+    End Sub
+
+    Private Sub DateTimePicker1_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles DateTimePicker1.ValueChanged
+        If (blnDONOTUPDATE = True) Then Exit Sub
+
+        Me.tmrSubmit.Enabled = True
+        
+    End Sub
+
+    Private Sub txtTime_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtTime.TextChanged
+        If (blnDONOTUPDATE = True) Then Exit Sub
+
+        Me.tmrSubmit.Enabled = True
+
+    End Sub
+
+    Private Sub tmrSubmit_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tmrSubmit.Tick
+        Dim clr_1 As Color = Color.Red
+        Dim clr_2 As Color = SystemColors.Control
+
+        If (Me.btnSubmit.BackColor = clr_1) Then
+            Me.btnSubmit.BackColor = clr_2
+        ElseIf (Me.btnSubmit.BackColor = clr_2) Then
+            Me.btnSubmit.BackColor = clr_1
+        Else
+            Me.btnSubmit.BackColor = clr_1
+        End If
+    End Sub
+
+    
+    Private Sub chkScroll_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkScroll.CheckedChanged
+        If (Me.chkScroll.Checked = True) Then
+            Me.txtDateOrRecords.Text = "Records"
+        End If
     End Sub
 End Class

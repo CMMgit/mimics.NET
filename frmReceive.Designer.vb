@@ -48,13 +48,17 @@ Partial Class frmReceive
         Me.lblNotListening_2 = New System.Windows.Forms.Label
         Me.lblListening_2 = New System.Windows.Forms.Label
         Me.pnlError = New System.Windows.Forms.Panel
-        Me.ComboBox1 = New System.Windows.Forms.ComboBox
         Me.btnErrorReset = New System.Windows.Forms.Button
         Me.lblError = New System.Windows.Forms.Label
         Me.rtbError = New System.Windows.Forms.RichTextBox
         Me.pnlGraph = New System.Windows.Forms.Panel
-        Me.optRecords = New System.Windows.Forms.RadioButton
-        Me.optDate = New System.Windows.Forms.RadioButton
+        Me.chkScroll = New System.Windows.Forms.CheckBox
+        Me.pnlChartVariables = New System.Windows.Forms.Panel
+        Me.txtRecordSel = New System.Windows.Forms.TextBox
+        Me.txtDateSel = New System.Windows.Forms.TextBox
+        Me.txtDateOrRecords = New System.Windows.Forms.TextBox
+        Me.btnSubmit = New System.Windows.Forms.Button
+        Me.lblNoIP = New System.Windows.Forms.Label
         Me.txtTime = New System.Windows.Forms.TextBox
         Me.DateTimePicker1 = New System.Windows.Forms.DateTimePicker
         Me.Label4 = New System.Windows.Forms.Label
@@ -74,11 +78,13 @@ Partial Class frmReceive
         Me.TrackBar1 = New System.Windows.Forms.TrackBar
         Me.tmrChart = New System.Windows.Forms.Timer(Me.components)
         Me.lblPollIndex = New System.Windows.Forms.Label
-        Me.lblNoIP = New System.Windows.Forms.Label
+        Me.tmrSubmit = New System.Windows.Forms.Timer(Me.components)
+        Me.txtDateTime = New System.Windows.Forms.TextBox
         Me.ToolStrip1.SuspendLayout()
         CType(Me.DG, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.pnlError.SuspendLayout()
         Me.pnlGraph.SuspendLayout()
+        Me.pnlChartVariables.SuspendLayout()
         CType(Me.Chart1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
@@ -279,7 +285,6 @@ Partial Class frmReceive
         '
         Me.pnlError.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(192, Byte), Integer), CType(CType(192, Byte), Integer))
         Me.pnlError.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
-        Me.pnlError.Controls.Add(Me.ComboBox1)
         Me.pnlError.Controls.Add(Me.btnErrorReset)
         Me.pnlError.Controls.Add(Me.lblError)
         Me.pnlError.Controls.Add(Me.rtbError)
@@ -288,14 +293,6 @@ Partial Class frmReceive
         Me.pnlError.Size = New System.Drawing.Size(877, 134)
         Me.pnlError.TabIndex = 18
         Me.pnlError.Visible = False
-        '
-        'ComboBox1
-        '
-        Me.ComboBox1.FormattingEnabled = True
-        Me.ComboBox1.Location = New System.Drawing.Point(153, 4)
-        Me.ComboBox1.Name = "ComboBox1"
-        Me.ComboBox1.Size = New System.Drawing.Size(121, 21)
-        Me.ComboBox1.TabIndex = 3
         '
         'btnErrorReset
         '
@@ -328,9 +325,10 @@ Partial Class frmReceive
         '
         Me.pnlGraph.BackColor = System.Drawing.SystemColors.GradientActiveCaption
         Me.pnlGraph.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
+        Me.pnlGraph.Controls.Add(Me.chkScroll)
+        Me.pnlGraph.Controls.Add(Me.pnlChartVariables)
+        Me.pnlGraph.Controls.Add(Me.btnSubmit)
         Me.pnlGraph.Controls.Add(Me.lblNoIP)
-        Me.pnlGraph.Controls.Add(Me.optRecords)
-        Me.pnlGraph.Controls.Add(Me.optDate)
         Me.pnlGraph.Controls.Add(Me.txtTime)
         Me.pnlGraph.Controls.Add(Me.DateTimePicker1)
         Me.pnlGraph.Controls.Add(Me.Label4)
@@ -354,29 +352,76 @@ Partial Class frmReceive
         Me.pnlGraph.TabIndex = 20
         Me.pnlGraph.Visible = False
         '
-        'optRecords
+        'chkScroll
         '
-        Me.optRecords.AutoSize = True
-        Me.optRecords.Checked = True
-        Me.optRecords.Location = New System.Drawing.Point(538, 8)
-        Me.optRecords.Name = "optRecords"
-        Me.optRecords.Size = New System.Drawing.Size(14, 13)
-        Me.optRecords.TabIndex = 35
-        Me.optRecords.TabStop = True
-        Me.optRecords.UseVisualStyleBackColor = True
+        Me.chkScroll.AutoSize = True
+        Me.chkScroll.Checked = True
+        Me.chkScroll.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkScroll.Location = New System.Drawing.Point(1254, 118)
+        Me.chkScroll.Name = "chkScroll"
+        Me.chkScroll.Size = New System.Drawing.Size(52, 17)
+        Me.chkScroll.TabIndex = 38
+        Me.chkScroll.Text = "Scroll"
+        Me.chkScroll.UseVisualStyleBackColor = True
         '
-        'optDate
+        'pnlChartVariables
         '
-        Me.optDate.AutoSize = True
-        Me.optDate.Location = New System.Drawing.Point(322, 8)
-        Me.optDate.Name = "optDate"
-        Me.optDate.Size = New System.Drawing.Size(14, 13)
-        Me.optDate.TabIndex = 34
-        Me.optDate.UseVisualStyleBackColor = True
+        Me.pnlChartVariables.Controls.Add(Me.txtDateTime)
+        Me.pnlChartVariables.Controls.Add(Me.txtRecordSel)
+        Me.pnlChartVariables.Controls.Add(Me.txtDateSel)
+        Me.pnlChartVariables.Controls.Add(Me.txtDateOrRecords)
+        Me.pnlChartVariables.Location = New System.Drawing.Point(1235, 167)
+        Me.pnlChartVariables.Name = "pnlChartVariables"
+        Me.pnlChartVariables.Size = New System.Drawing.Size(123, 107)
+        Me.pnlChartVariables.TabIndex = 37
+        '
+        'txtRecordSel
+        '
+        Me.txtRecordSel.Location = New System.Drawing.Point(3, 84)
+        Me.txtRecordSel.Name = "txtRecordSel"
+        Me.txtRecordSel.Size = New System.Drawing.Size(75, 20)
+        Me.txtRecordSel.TabIndex = 3
+        '
+        'txtDateSel
+        '
+        Me.txtDateSel.Location = New System.Drawing.Point(3, 29)
+        Me.txtDateSel.Name = "txtDateSel"
+        Me.txtDateSel.Size = New System.Drawing.Size(100, 20)
+        Me.txtDateSel.TabIndex = 1
+        '
+        'txtDateOrRecords
+        '
+        Me.txtDateOrRecords.Location = New System.Drawing.Point(3, 3)
+        Me.txtDateOrRecords.Name = "txtDateOrRecords"
+        Me.txtDateOrRecords.Size = New System.Drawing.Size(75, 20)
+        Me.txtDateOrRecords.TabIndex = 0
+        '
+        'btnSubmit
+        '
+        Me.btnSubmit.Font = New System.Drawing.Font("Microsoft Sans Serif", 6.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnSubmit.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.btnSubmit.Location = New System.Drawing.Point(1254, 141)
+        Me.btnSubmit.Name = "btnSubmit"
+        Me.btnSubmit.Size = New System.Drawing.Size(50, 23)
+        Me.btnSubmit.TabIndex = 36
+        Me.btnSubmit.Text = "Submit"
+        Me.btnSubmit.UseVisualStyleBackColor = True
+        '
+        'lblNoIP
+        '
+        Me.lblNoIP.AutoSize = True
+        Me.lblNoIP.Font = New System.Drawing.Font("Tahoma", 12.0!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblNoIP.ForeColor = System.Drawing.Color.Red
+        Me.lblNoIP.Location = New System.Drawing.Point(480, 127)
+        Me.lblNoIP.Name = "lblNoIP"
+        Me.lblNoIP.Size = New System.Drawing.Size(168, 19)
+        Me.lblNoIP.TabIndex = 22
+        Me.lblNoIP.Text = "No IP adress selected!!"
+        Me.lblNoIP.Visible = False
         '
         'txtTime
         '
-        Me.txtTime.Location = New System.Drawing.Point(435, 5)
+        Me.txtTime.Location = New System.Drawing.Point(410, 3)
         Me.txtTime.Name = "txtTime"
         Me.txtTime.Size = New System.Drawing.Size(68, 20)
         Me.txtTime.TabIndex = 33
@@ -384,7 +429,7 @@ Partial Class frmReceive
         'DateTimePicker1
         '
         Me.DateTimePicker1.Format = System.Windows.Forms.DateTimePickerFormat.Custom
-        Me.DateTimePicker1.Location = New System.Drawing.Point(342, 5)
+        Me.DateTimePicker1.Location = New System.Drawing.Point(317, 3)
         Me.DateTimePicker1.Name = "DateTimePicker1"
         Me.DateTimePicker1.Size = New System.Drawing.Size(87, 20)
         Me.DateTimePicker1.TabIndex = 32
@@ -434,13 +479,14 @@ Partial Class frmReceive
         '
         'Button3
         '
+        Me.Button3.BackColor = System.Drawing.SystemColors.Control
         Me.Button3.Font = New System.Drawing.Font("Microsoft Sans Serif", 6.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Button3.Location = New System.Drawing.Point(1145, 5)
         Me.Button3.Name = "Button3"
         Me.Button3.Size = New System.Drawing.Size(30, 23)
         Me.Button3.TabIndex = 22
         Me.Button3.Text = "Auto"
-        Me.Button3.UseVisualStyleBackColor = True
+        Me.Button3.UseVisualStyleBackColor = False
         '
         'Label2
         '
@@ -474,7 +520,7 @@ Partial Class frmReceive
         '
         Me.Label1.AutoSize = True
         Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label1.Location = New System.Drawing.Point(626, 8)
+        Me.Label1.Location = New System.Drawing.Point(552, 8)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(61, 17)
         Me.Label1.TabIndex = 8
@@ -482,7 +528,7 @@ Partial Class frmReceive
         '
         'txtRecordCount
         '
-        Me.txtRecordCount.Location = New System.Drawing.Point(558, 5)
+        Me.txtRecordCount.Location = New System.Drawing.Point(484, 3)
         Me.txtRecordCount.Name = "txtRecordCount"
         Me.txtRecordCount.Size = New System.Drawing.Size(62, 20)
         Me.txtRecordCount.TabIndex = 7
@@ -544,7 +590,7 @@ Partial Class frmReceive
         'TrackBar1
         '
         Me.TrackBar1.LargeChange = 100
-        Me.TrackBar1.Location = New System.Drawing.Point(695, 7)
+        Me.TrackBar1.Location = New System.Drawing.Point(619, 7)
         Me.TrackBar1.Maximum = 10000
         Me.TrackBar1.Minimum = 10
         Me.TrackBar1.Name = "TrackBar1"
@@ -568,17 +614,16 @@ Partial Class frmReceive
         Me.lblPollIndex.TabIndex = 21
         Me.lblPollIndex.Text = "pollIndex"
         '
-        'lblNoIP
+        'tmrSubmit
         '
-        Me.lblNoIP.AutoSize = True
-        Me.lblNoIP.Font = New System.Drawing.Font("Tahoma", 12.0!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblNoIP.ForeColor = System.Drawing.Color.Red
-        Me.lblNoIP.Location = New System.Drawing.Point(480, 127)
-        Me.lblNoIP.Name = "lblNoIP"
-        Me.lblNoIP.Size = New System.Drawing.Size(168, 19)
-        Me.lblNoIP.TabIndex = 22
-        Me.lblNoIP.Text = "No IP adress selected!!"
-        Me.lblNoIP.Visible = False
+        Me.tmrSubmit.Interval = 350
+        '
+        'txtDateTime
+        '
+        Me.txtDateTime.Location = New System.Drawing.Point(4, 55)
+        Me.txtDateTime.Name = "txtDateTime"
+        Me.txtDateTime.Size = New System.Drawing.Size(99, 20)
+        Me.txtDateTime.TabIndex = 4
         '
         'frmReceive
         '
@@ -614,6 +659,8 @@ Partial Class frmReceive
         Me.pnlError.PerformLayout()
         Me.pnlGraph.ResumeLayout(False)
         Me.pnlGraph.PerformLayout()
+        Me.pnlChartVariables.ResumeLayout(False)
+        Me.pnlChartVariables.PerformLayout()
         CType(Me.Chart1, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
@@ -643,7 +690,6 @@ Partial Class frmReceive
     Friend WithEvents rtbError As System.Windows.Forms.RichTextBox
     Friend WithEvents btnErrorReset As System.Windows.Forms.Button
     Friend WithEvents lblError As System.Windows.Forms.Label
-    Friend WithEvents ComboBox1 As System.Windows.Forms.ComboBox
     Friend WithEvents pnlGraph As System.Windows.Forms.Panel
     Friend WithEvents cmbSource_1 As System.Windows.Forms.ComboBox
     Friend WithEvents Button2 As System.Windows.Forms.Button
@@ -664,8 +710,14 @@ Partial Class frmReceive
     Friend WithEvents TrackBar1 As System.Windows.Forms.TrackBar
     Friend WithEvents DateTimePicker1 As System.Windows.Forms.DateTimePicker
     Friend WithEvents txtTime As System.Windows.Forms.TextBox
-    Friend WithEvents optRecords As System.Windows.Forms.RadioButton
-    Friend WithEvents optDate As System.Windows.Forms.RadioButton
     Friend WithEvents lblPollIndex As System.Windows.Forms.Label
     Friend WithEvents lblNoIP As System.Windows.Forms.Label
+    Friend WithEvents btnSubmit As System.Windows.Forms.Button
+    Friend WithEvents pnlChartVariables As System.Windows.Forms.Panel
+    Friend WithEvents txtRecordSel As System.Windows.Forms.TextBox
+    Friend WithEvents txtDateSel As System.Windows.Forms.TextBox
+    Friend WithEvents txtDateOrRecords As System.Windows.Forms.TextBox
+    Friend WithEvents tmrSubmit As System.Windows.Forms.Timer
+    Friend WithEvents chkScroll As System.Windows.Forms.CheckBox
+    Friend WithEvents txtDateTime As System.Windows.Forms.TextBox
 End Class

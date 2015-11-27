@@ -52,28 +52,27 @@ Public Class frmMain
     Private Sub btnReceive_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnReceive.Click
 
         For Each Form In Me.MdiChildren
-            If Form.Name = "frmReceive" Then Form.Close()
+            If Form.Name <> "frmMonitor" Then Form.Close()
         Next
 
         frmMonitor.Visible = False
+        frmMonitor.tmrRefresh.Enabled = False
+
         Dim frm As New frmReceive
         frm.MdiParent = Me
         frm.Show()
 
-        'frmMonitor.Visible = False
-        'Dim form As New frmReceive() With {.MdiParent = Me}
-        'form.Show()
-        'form.Activate()
+        
     End Sub
     Private Sub btnTransmit_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnTransmit.Click
 
 
         For Each Form In Me.MdiChildren
-            If Form.Name = "frmTransmit" Then Form.Close()
+            If Form.Name <> "frmMonitor" Then Form.Close()
         Next
-
         frmMonitor.Visible = False
         frmMonitor.tmrRefresh.Enabled = False
+
         Dim frm As New frmTransmit
         frm.MdiParent = Me
         frm.Show()
@@ -98,11 +97,12 @@ Public Class frmMain
             'If Len(strCustomer) = 0 Then strCustomer = "MBSA"
 
             'If this is Ian's  development machine then allow Customer setting
-            If (File.Exists("C:\CMM Mimics\zzDevMachine.ini")) Then
-                Dim frm As New frmDev
-                frm.ShowDialog()
-            End If
+            'If (File.Exists("C:\CMM Mimics\zzDevMachine.ini")) Then
+            '    Dim frm As New frmDev
+            '    frm.ShowDialog()
+            'End If
 
+            strCustomer = "MBSA"
             startUp()
 
             frmMonitor.Visible = True

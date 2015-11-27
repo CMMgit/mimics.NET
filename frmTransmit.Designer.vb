@@ -491,6 +491,7 @@ Partial Class frmTransmit
         Me.btnNow.TabIndex = 21
         Me.btnNow.Text = "Set new date time"
         Me.btnNow.UseVisualStyleBackColor = True
+        Me.btnNow.Visible = False
         '
         'DateTimePicker1
         '
@@ -499,6 +500,7 @@ Partial Class frmTransmit
         Me.DateTimePicker1.Name = "DateTimePicker1"
         Me.DateTimePicker1.Size = New System.Drawing.Size(241, 20)
         Me.DateTimePicker1.TabIndex = 22
+        Me.DateTimePicker1.Visible = False
         '
         'Label4
         '
@@ -509,6 +511,7 @@ Partial Class frmTransmit
         Me.Label4.Size = New System.Drawing.Size(248, 18)
         Me.Label4.TabIndex = 23
         Me.Label4.Text = "Reset Hadeco Cycle Start Date:"
+        Me.Label4.Visible = False
         '
         'frmTransmit
         '

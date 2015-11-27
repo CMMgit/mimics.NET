@@ -1093,25 +1093,28 @@ Public Class frmMonitor
         '         1         2         3         4         5         6         7         8         9         0         1         2         3         4         5         6         7         8
 
         Try
-            Dim strUnix As String
-            Dim lngUnix As Long
-            Dim q As Integer
-            For q = 2 To 20 Step 2
-                strUnix += Mid(szDatagram, q, 1)
-            Next
+            'Use the server's date time stamp for the incoming packet
+            Dim lngUnix As Long = (DateTime.UtcNow - New DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds
 
-            If Len(strUnix) <> 10 Then strUnix = 0
-            lngUnix = CLng(strUnix)
-            If lngUnix = 0 Then lngUnix = 1388534400 '01/01/2014 00:00:00
-            If lngUnix > 1388534400 Then lngUnix += 7200
+            'Dim strUnix As String
+            'Dim q As Integer
+            'For q = 2 To 20 Step 2
+            '    strUnix += Mid(sz, q, 1)
+            'Next
 
-            Dim strDate As String = mimicDate(lngUnix)
+            'If Len(strUnix) <> 10 Then strUnix = 0
+            'lngUnix = CLng(strUnix)
+            'If lngUnix = 0 Then lngUnix = 1388534400 '01/01/2014 00:00:00
+            'If lngUnix > 1388534400 Then lngUnix += 7200
+
+            Dim strDate As String = DateTime.Now.ToString() 'mimicDate(lngUnix)
             Dim datDate As Date = CDate(strDate)
             Dim strTime As String = mimicTime(lngUnix)
 
             Dim intIP As Int16 = Convert.ToInt32(Mid(szDatagram, 21, 2), 16)
             Dim strDevice As String = strSubnet & CStr(intIP)
             strUDP_IP = strDevice 'Set the global variable to ID which IP address this UDP datagram comes from
+            Dim strUnique As String = CStr(lngUnix) & strDevice
 
             'If (intIP < 90 Or intIP > 139) Then Exit Sub 'if old IP range then it is pre accelerometer
             Dim strData As String = szDatagram
@@ -1231,12 +1234,12 @@ Public Class frmMonitor
             aryAccelerometer(10) = CStr(Convert.ToInt32(Mid(strData, 173, 2), 16) << 8) + Convert.ToInt32(Mid(strData, 177, 2), 16)
             aryAccelerometer(11) = CStr(Convert.ToInt32(Mid(strData, 177, 2), 16) << 8) + Convert.ToInt32(Mid(strData, 179, 2), 16)
 
- 
-            strSql = "INSERT INTO `cmm`.`tblmimics` (datDate, strTime, strDevice," _
+
+            strSql = "INSERT INTO `cmm`.`tblmimics` (lngUnix, datDate, strTime, strDevice," _
             & " A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, Ext," _
             & " L1, L2, L3, L4, D0, D1, D2, D3, D4, D5, D6, D7, B1, B2, B3, B4, D8, D9, D10, D11, D12, D13, D14, D15," _
-            & " Peripheral_1, Peripheral_2, Peripheral_3, x_max, x_min, y_max, y_min, z_max, z_min, x_max_2, x_min_2, y_max_2, y_min_2, z_max_2, z_min_2)" _
-            & " VALUES ('" & strDate & "', '" & strTime & "', '" & strDevice & "'," _
+            & " Peripheral_1, Peripheral_2, Peripheral_3, x_max, x_min, y_max, y_min, z_max, z_min, x_max_2, x_min_2, y_max_2, y_min_2, z_max_2, z_min_2, strUnique)" _
+            & " VALUES (" & lngUnix & ", '" & strDate & "', '" & strTime & "', '" & strDevice & "'," _
             & "" & aryA(0) & ", " & aryA(1) & ", " & aryA(2) & ", " & aryA(3) & ", " & aryA(4) & ", " & aryA(5) & ", " & aryA(6) & ", " & aryA(7) & "," _
             & "" & aryA(8) & ", " & aryA(9) & ", " & aryA(10) & ", " & aryA(11) & ", " & aryA(12) & ", " & aryA(13) & ", " & aryA(14) & ", " & aryA(15) & "," _
             & "" & Ext & "," _
@@ -1246,14 +1249,24 @@ Public Class frmMonitor
             & "" & aryDin(4) & ", " & aryDin(5) & ", " & aryDin(6) & ", " & aryDin(7) & ", " & aryDin(8) & ", " & aryDin(9) & ", " & aryDin(10) & ", " & aryDin(11) & ", " _
             & "'" & aryPeripheral(0) & "', '" & aryPeripheral(1) & "', '" & aryPeripheral(2) & "', " _
             & "" & aryAccelerometer(0) & ", " & aryAccelerometer(1) & ", " & aryAccelerometer(2) & ", " & aryAccelerometer(3) & ", " & aryAccelerometer(4) & ", " & aryAccelerometer(5) & ", " _
-            & "" & aryAccelerometer(6) & ", " & aryAccelerometer(7) & ", " & aryAccelerometer(8) & ", " & aryAccelerometer(9) & ", " & aryAccelerometer(10) & ", " & aryAccelerometer(11) & ")"
-
+            & "" & aryAccelerometer(6) & ", " & aryAccelerometer(7) & ", " & aryAccelerometer(8) & ", " & aryAccelerometer(9) & ", " & aryAccelerometer(10) & ", " & aryAccelerometer(11) & ", '" & strUnique & "')"
 
             If MySqlCon.State = ConnectionState.Closed Then MySqlCon.Open()
             If MySqlCon.State = ConnectionState.Broken Then MySqlCon.Open()
             Dim sqlSelectCMD As MySqlCommand
             sqlSelectCMD = New MySqlCommand(strSql, MySqlCon)
             sqlSelectCMD.ExecuteScalar()
+
+            '           strSqlUPDATEholding = "UPDATE `cmm`.`tblmimics_holding` SET lngUnix = " & lngUnix & ", datDate = '" & strDate & "', strTime = '" & strTime & "'," _
+            '              & " A0 = " & aryA(0) & ", A1 = " & aryA(1) & ", A2 = " & aryA(2) & ", A3 = " & aryA(3) & ", A4 = " & aryA(4) & ", A5 = " & aryA(5) & ", A6 = " & aryA(6) & ", A7 = " & aryA(7) & ", A8 = " & aryA(8) & "," _
+            '             & " A9 = " & aryA(9) & ", A10 = " & aryA(10) & ", A11 = " & aryA(11) & ", A12 = " & aryA(12) & ", A13 = " & aryA(13) & ", A14 = " & aryA(14) & ", A15 = " & aryA(15) & ", Ext = " & Ext & ", " _
+            '            & " L1 = " & L1 & ", L2 = " & L2 & ", L3 = " & L3 & ", L4 = " & L4 & ", D0 = " & D0 & ", D1 = " & D1 & ", D2 = " & D2 & ", D3 = " & D3 & ", " _
+            '           & " D4 = " & D4 & ", D5 = " & D5 & ", D6 = " & D6 & ", D7 = " & D7 & ", D8 = " & D8 & ", D9 = " & D9 & ", D10 = " & D10 & ", D11 = " & D11 & ", " _
+            '          & " D12 = " & D12 & ", D13 = " & D13 & ", D14 = " & D14 & ", D15 = " & D15 & ", " _
+            '         & " Peripheral_1 = " & strPeripheral_1 & ", Peripheral_2 = " & strPeripheral_2 & ", Peripheral_3 = " & strPeripheral_3 & ", " _
+            '        & " x_max = " & acc0 & ", x_min = " & acc1 & ", y_max = " & acc2 & ", y_min = " & acc3 & ", z_max = " & acc4 & ", z_min = " & acc5 & ", " _
+            '       & " x_max_2 = " & acc6 & ", x_min_2 = " & acc7 & ", y_max_2 = " & acc8 & ", y_min_2 = " & acc9 & ", z_max_2 = " & acc10 & ", z_min_2 = " & acc11 & ", strUnique = '" & strUnique & "' WHERE strDEvice = '" & strDevice & "'"
+
 
             If Microsoft.VisualBasic.Left(szDatagram, 1) = "0" Then '"0" indicator for a data logging messsage
                 'Delete this IP from the mimics holding table - only one entry is required here
@@ -1292,7 +1305,7 @@ Public Class frmMonitor
             End If
 
         Catch ex As Exception
-            errorPanelsource("UDP_toArrays" & vbCrLf & szDatagram)
+            errorPanelsource("UDP_toArrays:" & strUDP_IP & vbCrLf & szDatagram)
             errorPanel(ex.Message)
         End Try
     End Sub
@@ -1311,6 +1324,7 @@ Public Class frmMonitor
         On Error GoTo Err
 
         'Reset the node status's and re read in the data from the holding table for the pre selected node
+        Dim lngUnix As Long = (DateTime.UtcNow - New DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds
 
         Me.lblDisconnect.Text = Nothing
         Me.lblDateTimeStamp.Text = Nothing
