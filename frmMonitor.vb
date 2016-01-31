@@ -1114,7 +1114,7 @@ Public Class frmMonitor
             Dim intIP As Int16 = Convert.ToInt32(Mid(szDatagram, 21, 2), 16)
             Dim strDevice As String = strSubnet & CStr(intIP)
             strUDP_IP = strDevice 'Set the global variable to ID which IP address this UDP datagram comes from
-            Dim strUnique As String = CStr(lngUnix) & strDevice
+            Dim dblUnique As String = (lngUnix - 1000000000) + (intIP / 1000)
 
             'If (intIP < 90 Or intIP > 139) Then Exit Sub 'if old IP range then it is pre accelerometer
             Dim strData As String = szDatagram
@@ -1238,7 +1238,7 @@ Public Class frmMonitor
             strSql = "INSERT INTO `cmm`.`tblmimics` (lngUnix, datDate, strTime, strDevice," _
             & " A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, Ext," _
             & " L1, L2, L3, L4, D0, D1, D2, D3, D4, D5, D6, D7, B1, B2, B3, B4, D8, D9, D10, D11, D12, D13, D14, D15," _
-            & " Peripheral_1, Peripheral_2, Peripheral_3, x_max, x_min, y_max, y_min, z_max, z_min, x_max_2, x_min_2, y_max_2, y_min_2, z_max_2, z_min_2, strUnique)" _
+            & " Peripheral_1, Peripheral_2, Peripheral_3, x_max, x_min, y_max, y_min, z_max, z_min, x_max_2, x_min_2, y_max_2, y_min_2, z_max_2, z_min_2, dblUnique)" _
             & " VALUES (" & lngUnix & ", '" & strDate & "', '" & strTime & "', '" & strDevice & "'," _
             & "" & aryA(0) & ", " & aryA(1) & ", " & aryA(2) & ", " & aryA(3) & ", " & aryA(4) & ", " & aryA(5) & ", " & aryA(6) & ", " & aryA(7) & "," _
             & "" & aryA(8) & ", " & aryA(9) & ", " & aryA(10) & ", " & aryA(11) & ", " & aryA(12) & ", " & aryA(13) & ", " & aryA(14) & ", " & aryA(15) & "," _
@@ -1249,7 +1249,7 @@ Public Class frmMonitor
             & "" & aryDin(4) & ", " & aryDin(5) & ", " & aryDin(6) & ", " & aryDin(7) & ", " & aryDin(8) & ", " & aryDin(9) & ", " & aryDin(10) & ", " & aryDin(11) & ", " _
             & "'" & aryPeripheral(0) & "', '" & aryPeripheral(1) & "', '" & aryPeripheral(2) & "', " _
             & "" & aryAccelerometer(0) & ", " & aryAccelerometer(1) & ", " & aryAccelerometer(2) & ", " & aryAccelerometer(3) & ", " & aryAccelerometer(4) & ", " & aryAccelerometer(5) & ", " _
-            & "" & aryAccelerometer(6) & ", " & aryAccelerometer(7) & ", " & aryAccelerometer(8) & ", " & aryAccelerometer(9) & ", " & aryAccelerometer(10) & ", " & aryAccelerometer(11) & ", '" & strUnique & "')"
+            & "" & aryAccelerometer(6) & ", " & aryAccelerometer(7) & ", " & aryAccelerometer(8) & ", " & aryAccelerometer(9) & ", " & aryAccelerometer(10) & ", " & aryAccelerometer(11) & ", '" & dblUnique & "')"
 
             If MySqlCon.State = ConnectionState.Closed Then MySqlCon.Open()
             If MySqlCon.State = ConnectionState.Broken Then MySqlCon.Open()

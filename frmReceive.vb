@@ -283,13 +283,12 @@ Public Class frmReceive
                 'Iterate through the tblHolding table
                 Dim strIP As String = sqlReader.Item("strDevice").ToString()
                 If (Microsoft.VisualBasic.Right(strIP, 3) = "131") Then strIP = strIP
-                strUnique = sqlReader.Item("lngUnix").ToString() & sqlReader.Item("strDevice").ToString()
-                strUnique = sqlReader.Item("strUnique").ToString()
+                strUnique = sqlReader.Item("dblUnique").ToString()
 
                 'Iterate through the datagrid to see if it is there 
                 blnFound = False
                 For Each row In dbset.Tables("tblGrid").Rows
-                    If strUnique = row.Item("strUnique").ToString Then
+                    If strUnique = row.Item("dblUnique").ToString Then
                         blnFound = True
                         Exit For
                     End If

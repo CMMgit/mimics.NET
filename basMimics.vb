@@ -57,7 +57,7 @@ Imports MySql.Data.MySqlClient
 Module basMimics
 
     '***********************************************************************
-    Public strVersion As String = "Version 2.44 : 27/10/2015"
+    Public strVersion As String = "Version 2.45 : 26/01/2016"
     Public strMySqlDb As String
     Public baseIP As Integer = 90
     Public blnAppMultiple As Boolean = False
