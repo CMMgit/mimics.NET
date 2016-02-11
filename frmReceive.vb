@@ -484,10 +484,12 @@ Public Class frmReceive
         If (blnEnableChart = False) Then Exit Sub
         If (Me.cmbIP.Text = "All ip's") Then
             Me.lblNoIP.Visible = True
+            Me.tmrFlash.Enabled = True
             Exit Sub
         End If
 
         Me.lblNoIP.Visible = False
+        Me.tmrFlash.Enabled = False
 
         Try
             If (Len(Me.txtRecordSel.Text) = 0) Then Exit Sub
@@ -776,6 +778,19 @@ Public Class frmReceive
     Private Sub chkScroll_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkScroll.CheckedChanged
         If (Me.chkScroll.Checked = True) Then
             Me.txtDateOrRecords.Text = "Records"
+        End If
+    End Sub
+
+    Private Sub tmrFlash_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tmrFlash.Tick
+        Dim clr_1 As Color = Color.Red
+        Dim clr_2 As Color = SystemColors.Control
+
+        If (Me.lblNoIP.ForeColor = clr_1) Then
+            Me.lblNoIP.ForeColor = clr_2
+        ElseIf (Me.lblNoIP.ForeColor = clr_2) Then
+            Me.lblNoIP.ForeColor = clr_1
+        Else
+            Me.lblNoIP.ForeColor = clr_1
         End If
     End Sub
 End Class

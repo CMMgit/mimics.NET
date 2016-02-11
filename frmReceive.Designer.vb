@@ -54,6 +54,7 @@ Partial Class frmReceive
         Me.pnlGraph = New System.Windows.Forms.Panel
         Me.chkScroll = New System.Windows.Forms.CheckBox
         Me.pnlChartVariables = New System.Windows.Forms.Panel
+        Me.txtDateTime = New System.Windows.Forms.TextBox
         Me.txtRecordSel = New System.Windows.Forms.TextBox
         Me.txtDateSel = New System.Windows.Forms.TextBox
         Me.txtDateOrRecords = New System.Windows.Forms.TextBox
@@ -79,7 +80,7 @@ Partial Class frmReceive
         Me.tmrChart = New System.Windows.Forms.Timer(Me.components)
         Me.lblPollIndex = New System.Windows.Forms.Label
         Me.tmrSubmit = New System.Windows.Forms.Timer(Me.components)
-        Me.txtDateTime = New System.Windows.Forms.TextBox
+        Me.tmrFlash = New System.Windows.Forms.Timer(Me.components)
         Me.ToolStrip1.SuspendLayout()
         CType(Me.DG, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.pnlError.SuspendLayout()
@@ -355,6 +356,7 @@ Partial Class frmReceive
         'chkScroll
         '
         Me.chkScroll.AutoSize = True
+        Me.chkScroll.BackColor = System.Drawing.SystemColors.InactiveCaption
         Me.chkScroll.Checked = True
         Me.chkScroll.CheckState = System.Windows.Forms.CheckState.Checked
         Me.chkScroll.Location = New System.Drawing.Point(1254, 118)
@@ -362,10 +364,11 @@ Partial Class frmReceive
         Me.chkScroll.Size = New System.Drawing.Size(52, 17)
         Me.chkScroll.TabIndex = 38
         Me.chkScroll.Text = "Scroll"
-        Me.chkScroll.UseVisualStyleBackColor = True
+        Me.chkScroll.UseVisualStyleBackColor = False
         '
         'pnlChartVariables
         '
+        Me.pnlChartVariables.BackColor = System.Drawing.SystemColors.InactiveCaption
         Me.pnlChartVariables.Controls.Add(Me.txtDateTime)
         Me.pnlChartVariables.Controls.Add(Me.txtRecordSel)
         Me.pnlChartVariables.Controls.Add(Me.txtDateSel)
@@ -374,6 +377,13 @@ Partial Class frmReceive
         Me.pnlChartVariables.Name = "pnlChartVariables"
         Me.pnlChartVariables.Size = New System.Drawing.Size(123, 107)
         Me.pnlChartVariables.TabIndex = 37
+        '
+        'txtDateTime
+        '
+        Me.txtDateTime.Location = New System.Drawing.Point(4, 55)
+        Me.txtDateTime.Name = "txtDateTime"
+        Me.txtDateTime.Size = New System.Drawing.Size(99, 20)
+        Me.txtDateTime.TabIndex = 4
         '
         'txtRecordSel
         '
@@ -410,11 +420,12 @@ Partial Class frmReceive
         'lblNoIP
         '
         Me.lblNoIP.AutoSize = True
-        Me.lblNoIP.Font = New System.Drawing.Font("Tahoma", 12.0!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblNoIP.BackColor = System.Drawing.SystemColors.Info
+        Me.lblNoIP.Font = New System.Drawing.Font("Tahoma", 12.0!, CType((System.Drawing.FontStyle.Bold Or System.Drawing.FontStyle.Italic), System.Drawing.FontStyle), System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblNoIP.ForeColor = System.Drawing.Color.Red
         Me.lblNoIP.Location = New System.Drawing.Point(480, 127)
         Me.lblNoIP.Name = "lblNoIP"
-        Me.lblNoIP.Size = New System.Drawing.Size(168, 19)
+        Me.lblNoIP.Size = New System.Drawing.Size(195, 19)
         Me.lblNoIP.TabIndex = 22
         Me.lblNoIP.Text = "No IP adress selected!!"
         Me.lblNoIP.Visible = False
@@ -618,12 +629,9 @@ Partial Class frmReceive
         '
         Me.tmrSubmit.Interval = 350
         '
-        'txtDateTime
+        'tmrFlash
         '
-        Me.txtDateTime.Location = New System.Drawing.Point(4, 55)
-        Me.txtDateTime.Name = "txtDateTime"
-        Me.txtDateTime.Size = New System.Drawing.Size(99, 20)
-        Me.txtDateTime.TabIndex = 4
+        Me.tmrFlash.Interval = 350
         '
         'frmReceive
         '
@@ -720,4 +728,5 @@ Partial Class frmReceive
     Friend WithEvents tmrSubmit As System.Windows.Forms.Timer
     Friend WithEvents chkScroll As System.Windows.Forms.CheckBox
     Friend WithEvents txtDateTime As System.Windows.Forms.TextBox
+    Friend WithEvents tmrFlash As System.Windows.Forms.Timer
 End Class
